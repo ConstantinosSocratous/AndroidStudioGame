@@ -18,11 +18,13 @@ public class GameState extends State {
 
     private ObstacleHandler obstacleHandler;
     private boolean gameOver, gameRunning, welcomeScreen, instructions, gameOverScreen;
-    private int score;
+    private int score,highScore;
+
 
     public GameState(Handler handler){
         super(handler);
         obstacleHandler = new ObstacleHandler(handler);
+        highScore = this.handler.getGamePanel().getHighScore();
         
         gameOver = true;
         gameRunning = false;
@@ -63,10 +65,10 @@ public class GameState extends State {
         }
 
         //TODO: FIX WAY OF INCREASING ROADS;
-        if(score == 10) {
-            obstacleHandler.increaseRoadSize();
-            score++;
-        }
+//        if(score == 10) {
+//            obstacleHandler.increaseRoadSize();
+//            score++;
+//        }
     }
 
     public void draw(Canvas canvas){
@@ -110,6 +112,12 @@ public class GameState extends State {
 
         disableEntitiesToMove();
         handler.getGamePanel().vibrate(500);
+
+
+        if(score > highScore) { //Save high-score
+            this.handler.getGamePanel().save(score);
+            highScore = this.handler.getGamePanel().getHighScore();
+        }
 
         try{
             Thread.sleep(1000);
@@ -162,5 +170,7 @@ public class GameState extends State {
         paint.setTextSize(95);
         canvas.drawText("Game Over", (int) (handler.getWidth() * 0.33), (int)(handler.getHeight() * 0.30), paint);
         canvas.drawText("Score: " + score, (int) (handler.getWidth() * 0.35), (int)(handler.getHeight() * 0.40), paint);
+        canvas.drawText("High Score: " + highScore, (int) (handler.getWidth() * 0.32), (int)(handler.getHeight() * 0.50), paint);
+
     }
 }

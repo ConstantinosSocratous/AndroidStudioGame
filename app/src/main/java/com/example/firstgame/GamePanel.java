@@ -10,12 +10,20 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.Toast;
 
 import com.example.firstgame.Entities.Entity;
 import com.example.firstgame.Entities.Player;
 import com.example.firstgame.Entities.SideWall;
 import com.example.firstgame.States.GameState;
 import com.example.firstgame.States.State;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 import static android.support.v4.content.ContextCompat.getSystemService;
 
@@ -124,5 +132,54 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             vibrator.vibrate(milliseconds);
         }
     }
+
+    public int getHighScore() {
+
+        String a="";
+        try {
+            FileInputStream file = getContext().openFileInput("file.txt");
+            InputStreamReader isr = new InputStreamReader(file);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String text;
+
+            if ((text = br.readLine()) != null) {
+                a = text;
+            }
+
+            file.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return Integer.parseInt(a);
+    }
+
+    public void save(int str) {
+
+        String text = ""+str;
+        FileOutputStream fos = null;
+
+        try {
+            fos = getContext().openFileOutput("file.txt", getContext().MODE_PRIVATE);
+            fos.write(text.getBytes());
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
 }
