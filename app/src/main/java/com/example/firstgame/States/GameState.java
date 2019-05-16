@@ -4,6 +4,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
+import com.example.firstgame.Button;
 import com.example.firstgame.Entities.Entity;
 import com.example.firstgame.Entities.Player;
 import com.example.firstgame.Entities.SideWall;
@@ -18,7 +19,9 @@ public class GameState extends State {
 
     private ObstacleHandler obstacleHandler;
     private boolean gameOver, gameRunning, welcomeScreen, instructions, gameOverScreen;
+    private boolean pause = false;
     private int score,highScore;
+    private Button pauseBtn,continueBtn;
 
 
     public GameState(Handler handler){
@@ -32,6 +35,12 @@ public class GameState extends State {
         welcomeScreen = true;
         instructions = true;
         gameOverScreen = false;
+
+        pauseBtn = new Button((int)(handler.getWidth() * 0.85),20,(int)(handler.getWidth() * 0.06),
+                (int)(handler.getHeight() * 0.03));
+        continueBtn = new Button((int)(handler.getWidth() * 0.45),(int)(handler.getHeight() * 0.60),
+                (int)(handler.getWidth() * 0.18),(int)(handler.getHeight() * 0.10));
+
     }
 
     private void startGame(){
@@ -43,11 +52,12 @@ public class GameState extends State {
         gameOver = false;
         gameRunning = true;
         score = 0;
-        obstacleHandler.initRoads();
+        obstacleHandler.init();
 
         welcomeScreen = false;
         instructions = false;
         gameOverScreen = false;
+
     }
 
     public void update(){
@@ -55,8 +65,19 @@ public class GameState extends State {
             startGame();
         }
 
-        for (Entity entity : handler.getEntities()) {
-            entity.update();
+        if(gameRunning && pauseBtn.isClicked()){   //Check if pause is clicked
+            pause = true;
+            return;
+        }
+
+        if(!pause) {
+            for (Entity entity : handler.getEntities()) {
+                entity.update();
+            }
+        }
+
+        if(continueBtn.isClicked()){
+            pause = false;
         }
 
         if(gameRunning){
@@ -65,10 +86,19 @@ public class GameState extends State {
         }
 
         //TODO: FIX WAY OF INCREASING ROADS;
-//        if(score == 10) {
-//            obstacleHandler.increaseRoadSize();
-//            score++;
-//        }
+        if(score == 8) {
+            obstacleHandler.increaseRoadSize();
+            score++;
+        }else if(score == 16) {
+            obstacleHandler.increaseRoadSize();
+            score++;
+        }else if(score == 34) {
+            obstacleHandler.increaseSpeed();
+            score++;
+        }else if(score == 60) {
+            obstacleHandler.increaseRoadSize();
+            score++;
+        }
     }
 
     public void draw(Canvas canvas){
@@ -81,6 +111,8 @@ public class GameState extends State {
             paint.setColor(Color.BLACK);
             paint.setTextSize(100);
             canvas.drawText("" + score, (int) (handler.getWidth() * 0.50), 100, paint);
+
+
         }
 
         if(gameOverScreen){ //When the player lose
@@ -93,6 +125,13 @@ public class GameState extends State {
 
         if(welcomeScreen){ //Show welcome screen
             showWelcomeScreen(canvas);
+        }
+
+        if(pause){
+            showGamePause(canvas);
+            continueBtn.draw(canvas);
+        }else{
+            pauseBtn.draw(canvas);  //Draw pause Button if game is running
         }
     }
 
@@ -172,5 +211,17 @@ public class GameState extends State {
         canvas.drawText("Score: " + score, (int) (handler.getWidth() * 0.35), (int)(handler.getHeight() * 0.40), paint);
         canvas.drawText("High Score: " + highScore, (int) (handler.getWidth() * 0.32), (int)(handler.getHeight() * 0.50), paint);
 
+    }
+
+    /**
+     * Show game pause screen
+     */
+    private void showGamePause(Canvas canvas){
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(95);
+        canvas.drawText("Pause", (int) (handler.getWidth() * 0.45), (int)(handler.getHeight() * 0.40), paint);
+        paint.setTextSize(75);
+        canvas.drawText("Click to continue" , (int) (handler.getWidth() * 0.33), (int)(handler.getHeight() * 0.50), paint);
     }
 }

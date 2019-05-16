@@ -81,12 +81,13 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     @Override
     public boolean onTouchEvent(MotionEvent event){
+        Input.x = (int) event.getX();
+        Input.y = (int) event.getY();
+
         if(event.getX() > (handler.getWidth() * 0.5) ){
             Input.left = false;
-            //return false;
         }else if(event.getX() <= (handler.getWidth() * 0.5) ){
             Input.left = true;
-            //return true;
         }
 
         if(event.getAction() == MotionEvent.ACTION_UP) {
