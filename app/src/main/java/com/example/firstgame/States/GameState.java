@@ -1,5 +1,7 @@
 package com.example.firstgame.States;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,7 +12,9 @@ import com.example.firstgame.Entities.Player;
 import com.example.firstgame.Entities.SideWall;
 import com.example.firstgame.Handler;
 import com.example.firstgame.Input;
+import com.example.firstgame.MainActivity;
 import com.example.firstgame.ObstacleHandler;
+import com.example.firstgame.R;
 
 public class GameState extends State {
 
@@ -21,8 +25,8 @@ public class GameState extends State {
     private boolean gameOver, gameRunning, welcomeScreen, instructions, gameOverScreen;
     private boolean pause = false;
     private int score,highScore;
-    private Button pauseBtn,continueBtn;
-
+    private boolean musicMute = false;
+    private Button pauseBtn, musicBtn;
 
     public GameState(Handler handler){
         super(handler);
@@ -36,10 +40,11 @@ public class GameState extends State {
         instructions = true;
         gameOverScreen = false;
 
-        pauseBtn = new Button((int)(handler.getWidth() * 0.85),20,(int)(handler.getWidth() * 0.06),
-                (int)(handler.getHeight() * 0.03));
-        continueBtn = new Button((int)(handler.getWidth() * 0.45),(int)(handler.getHeight() * 0.60),
-                (int)(handler.getWidth() * 0.18),(int)(handler.getHeight() * 0.10));
+        pauseBtn = new Button((int)(handler.getWidth() * 0.85),(int)(handler.getHeight() * 0.01),(int)(handler.getWidth() * 0.09),
+                (int)(handler.getHeight() * 0.07), handler, R.drawable.pause);
+
+        musicBtn = new Button((int)(handler.getWidth() * 0.06),(int)(handler.getHeight() * 0.01),(int)(handler.getWidth() * 0.09),
+                (int)(handler.getHeight() * 0.07), handler, R.drawable.music);
 
     }
 
@@ -61,9 +66,25 @@ public class GameState extends State {
     }
 
     public void update(){
+        if(Input.isClicked && musicBtn.isClicked()){
+            MainActivity.pauseMusic();
+            try {
+                Thread.sleep(1000);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            return;
+        }
+
         if(isGameOver() && Input.isClicked){
             startGame();
         }
+
+        if(Input.isClicked){
+            pause = false;
+        }
+
+        if(pause) return;
 
         if(gameRunning && pauseBtn.isClicked()){   //Check if pause is clicked
             pause = true;
@@ -74,10 +95,6 @@ public class GameState extends State {
             for (Entity entity : handler.getEntities()) {
                 entity.update();
             }
-        }
-
-        if(continueBtn.isClicked()){
-            pause = false;
         }
 
         if(gameRunning){
@@ -98,6 +115,9 @@ public class GameState extends State {
         }else if(score == 60) {
             obstacleHandler.increaseRoadSize();
             score++;
+        }else if(score == 100) {
+            this.handler.getPlayer().setSpeed(this.handler.getPlayer().getSpeed() + 4);
+            score++;
         }
     }
 
@@ -112,7 +132,10 @@ public class GameState extends State {
             paint.setTextSize(100);
             canvas.drawText("" + score, (int) (handler.getWidth() * 0.50), 100, paint);
 
+            pauseBtn.draw(canvas);  //Draw pause Button if game is running
 
+        }else{
+            musicBtn.draw(canvas);
         }
 
         if(gameOverScreen){ //When the player lose
@@ -129,9 +152,6 @@ public class GameState extends State {
 
         if(pause){
             showGamePause(canvas);
-            continueBtn.draw(canvas);
-        }else{
-            pauseBtn.draw(canvas);  //Draw pause Button if game is running
         }
     }
 
@@ -141,8 +161,6 @@ public class GameState extends State {
     }
 
     public void setGameOver() {
-        System.out.println("GAME OVER");
-
         this.gameOver = true;
         this.gameRunning = false;
 
@@ -182,7 +200,7 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(95);
-        canvas.drawText("Click once to start game", (int) (handler.getWidth() * 0.15), (int)(handler.getHeight() * 0.30), paint);
+        canvas.drawText("Click to play", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.30), paint);
     }
 
     /**
@@ -192,10 +210,10 @@ public class GameState extends State {
      */
     private void showInstructions(Canvas canvas){
         Paint paint = new Paint();
-        paint.setColor(Color.RED);
+        paint.setColor(Color.WHITE);
         paint.setTextSize(70);
-        canvas.drawText("Click right or left", (int) (handler.getWidth() * 0.30), (int)(handler.getHeight() * 0.70), paint);
-        canvas.drawText("to define the direction", (int) (handler.getWidth() * 0.27), (int)(handler.getHeight() * 0.75), paint);
+        canvas.drawText("Click right or left", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.70), paint);
+        canvas.drawText("to define the direction", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.75), paint);
     }
 
     /**
@@ -207,9 +225,9 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(95);
-        canvas.drawText("Game Over", (int) (handler.getWidth() * 0.33), (int)(handler.getHeight() * 0.30), paint);
-        canvas.drawText("Score: " + score, (int) (handler.getWidth() * 0.35), (int)(handler.getHeight() * 0.40), paint);
-        canvas.drawText("High Score: " + highScore, (int) (handler.getWidth() * 0.32), (int)(handler.getHeight() * 0.50), paint);
+        canvas.drawText("Game Over", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.30), paint);
+        canvas.drawText("Score: " + score, (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.40), paint);
+        canvas.drawText("High Score: " + highScore, (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.50), paint);
 
     }
 
@@ -220,8 +238,24 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(95);
-        canvas.drawText("Pause", (int) (handler.getWidth() * 0.45), (int)(handler.getHeight() * 0.40), paint);
+        canvas.drawText("Pause", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.40), paint);
         paint.setTextSize(75);
-        canvas.drawText("Click to continue" , (int) (handler.getWidth() * 0.33), (int)(handler.getHeight() * 0.50), paint);
+        canvas.drawText("Click to continue" , (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.50), paint);
+    }
+
+    public void pauseGame(){
+        pause = true;
+    }
+
+    public boolean isGameRunning(){
+        return gameRunning;
+    }
+
+    public void resumeGame(){
+        pause = false;
+    }
+
+    public ObstacleHandler getObstacleHandler(){
+        return obstacleHandler;
     }
 }

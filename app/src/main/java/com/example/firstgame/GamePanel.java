@@ -1,8 +1,11 @@
 package com.example.firstgame;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -10,11 +13,7 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.Toast;
 
-import com.example.firstgame.Entities.Entity;
-import com.example.firstgame.Entities.Player;
-import com.example.firstgame.Entities.SideWall;
 import com.example.firstgame.States.GameState;
 import com.example.firstgame.States.State;
 
@@ -25,16 +24,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static android.support.v4.content.ContextCompat.getSystemService;
-
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     private MainThread mainThread;
     private State gameState,currentState;
     private Handler handler;
     private int width,height;
-
-
+    
     public GamePanel(Context context){
         super(context);
         getHolder().addCallback(this);
@@ -63,12 +59,18 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {}
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+
+    }
 
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
+        if(((GameState)gameState).isGameRunning()){
+            pauseGame();
+        }
         boolean retry = true;
-        while(true){
+
+        while(retry){
             try{
                 mainThread.setRunning(false);
                 mainThread.join();
@@ -107,7 +109,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void draw(Canvas canvas){
         super.draw(canvas);
-        canvas.drawColor(Color.WHITE);
+
+        canvas.drawColor(Color.parseColor("#C0C0C0"));
 
         if(currentState != null)
             currentState.draw(canvas);
@@ -134,9 +137,12 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    /**
+     * Get high score from file
+     * @return
+     */
     public int getHighScore() {
-
-        String a="";
+        String a="0";
         try {
             FileInputStream file = getContext().openFileInput("file.txt");
             InputStreamReader isr = new InputStreamReader(file);
@@ -157,8 +163,11 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         return Integer.parseInt(a);
     }
 
+    /**
+     * Save highScore
+     * @param str
+     */
     public void save(int str) {
-
         String text = ""+str;
         FileOutputStream fos = null;
 
@@ -180,6 +189,14 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
                 }
             }
         }
+    }
+
+    public void pauseGame(){
+        ((GameState)(this.gameState)).pauseGame();
+    }
+
+    public void resumeGame(){
+        ((GameState)(this.gameState)).resumeGame();
     }
 
 

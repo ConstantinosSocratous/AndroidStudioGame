@@ -58,4 +58,8 @@ public class Handler {
     public void initEntities(){
         this.entities = new ArrayList<>();
     }
+
+    public Player getPlayer(){
+        return player;
+    }
 }

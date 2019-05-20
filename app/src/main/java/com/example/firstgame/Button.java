@@ -1,19 +1,26 @@
 package com.example.firstgame;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 
+
 public class Button {
 
     private int x,y,width,height;
+    private Handler handler;
+    private int img;
 
-    public Button(int x, int y, int width, int height){
+    public Button(int x, int y, int width, int height, Handler handler, int img){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.handler = handler;
+        this.img = img;
     }
 
     /**
@@ -24,7 +31,8 @@ public class Button {
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
 
-        canvas.drawRect(x,y,x+width,y+height,paint);
+        Bitmap bmp = BitmapFactory.decodeResource(handler.getGamePanel().getResources(),this.img);
+        canvas.drawBitmap(bmp, x,y, paint);
     }
 
     public boolean isClicked(){
@@ -34,5 +42,9 @@ public class Button {
             return true;
         }
         return false;
+    }
+
+    public void setImg(int num){
+        this.img = num;
     }
 }

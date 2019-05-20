@@ -11,6 +11,9 @@ import java.util.Random;
 
 public class ObstacleHandler {
 
+    private final int decreaseSpeedNum = 7;
+    private boolean isSpeedDecreased = false;
+
     private int speedUpper = 25, speedLower = 10;
     private Handler handler;
     private int roadSize = 3;   //3-7
@@ -52,6 +55,8 @@ public class ObstacleHandler {
                 float y = random.nextInt(40) + 10;
                 y = y/100;
                 y = - (handler.getHeight() * (y));
+
+                if(x > widthTemp*0.90) continue;
 
                 handler.addEntity(new Obstacle(x , (int)y, (int) (handler.getWidth() * (dimension)),
                         (int) (handler.getHeight() * (dimension)), handler, speed,num));
@@ -96,8 +101,21 @@ public class ObstacleHandler {
     }
 
     public void increaseSpeed(){
-        speedLower+=1;
-        speedUpper+=5;
+        speedUpper+= 6;
+    }
+
+    public void increaseSpeed(int num){
+        speedUpper+= num;
+    }
+
+    public void resetSpeed(){
+        speedUpper+= decreaseSpeedNum;
+        isSpeedDecreased = false;
+    }
+
+    public void decreaseSpeed(){
+        isSpeedDecreased = true;
+        speedUpper-= decreaseSpeedNum;
     }
 
 

@@ -24,7 +24,7 @@ public class SideWall extends Entity {
      */
     public void draw(Canvas canvas){
         Paint paint = new Paint();
-        paint.setColor(Color.RED);
+        paint.setColor(Color.parseColor("#993333"));
 
         canvas.drawRect(x,y,x+width,y+height,paint);
     }

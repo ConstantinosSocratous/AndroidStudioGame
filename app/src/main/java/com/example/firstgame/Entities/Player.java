@@ -3,6 +3,7 @@ package com.example.firstgame.Entities;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.view.inputmethod.CursorAnchorInfo;
 
 import com.example.firstgame.Handler;
 import com.example.firstgame.Input;
@@ -11,8 +12,7 @@ import java.util.ArrayList;
 
 public class Player extends Entity {
 
-    private final int speed = 25;
-
+    private int speed = 22;
     private boolean directionRight = true;
 
     public Player(int x, int y, int width, int height, Handler handler){
@@ -97,8 +97,15 @@ public class Player extends Entity {
      */
     public void draw(Canvas canvas){
         Paint paint = new Paint();
-        paint.setColor(Color.BLUE);
+        paint.setColor(Color.rgb(12,40,120));
 
         canvas.drawRect(x,y,x+width,y+height,paint);
+    }
+
+    public void setSpeed(int num){
+        this.speed = num;
+    }
+    public int getSpeed(){
+        return speed;
     }
 }

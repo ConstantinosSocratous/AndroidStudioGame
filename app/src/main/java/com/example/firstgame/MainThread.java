@@ -40,7 +40,11 @@ public class MainThread extends Thread{
                 canvas = this.surfaceHolder.lockCanvas();
                 synchronized (surfaceHolder){
                     this.gamePanel.update();
-                    this.gamePanel.draw(canvas);
+                    try{
+                        this.gamePanel.draw(canvas);
+                    }catch (Exception e){
+                    }
+
                 }
             }catch (Exception e){
 
@@ -74,5 +78,6 @@ public class MainThread extends Thread{
                 //System.out.println("FPS: " + averageFPS);
             }
         }
+
     }
 }

@@ -1,6 +1,7 @@
 package com.example.firstgame.Entities;
 
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.example.firstgame.Colors;
@@ -49,7 +50,8 @@ public class Obstacle extends Entity {
 
     private int pickRandomColor(){
         Random rand = new Random();
-        int num = rand.nextInt(Colors.ALL_COLORS.size()-1)+1;
+
+        int num = rand.nextInt(Colors.ALL_COLORS.size())+1;
         return Colors.ALL_COLORS.get(num);
     }
 

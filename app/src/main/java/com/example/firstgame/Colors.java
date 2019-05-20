@@ -7,13 +7,10 @@ import java.util.HashMap;
 public class Colors {
 
     public static HashMap<Integer, Integer> ALL_COLORS =  new HashMap<Integer, Integer>(){{
-        put(1,Color.DKGRAY);
-        put(2,Color.GREEN);
-        put(3,Color.GRAY);
-        put(4,Color.YELLOW);
-        put(5,Color.LTGRAY);
-        put(6,Color.CYAN);
-        put(7,Color.BLACK);
+        //Color.parseColor("#C0C0C0")
+        put(1,Color.GRAY);
+        put(2,Color.rgb(160,00,55));
+        put(3,Color.rgb(34,98,12));
     }};
 
     public Colors(){}
