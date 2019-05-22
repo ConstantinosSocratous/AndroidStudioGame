@@ -152,6 +152,7 @@ public class GameState extends State {
 
         if(pause){
             showGamePause(canvas);
+            musicBtn.draw(canvas);
         }
     }
 
