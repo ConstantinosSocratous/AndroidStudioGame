@@ -1,18 +1,25 @@
 package com.example.firstgame;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
+import android.os.health.SystemHealthManager;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.EditText;
 
 import com.example.firstgame.States.GameState;
 import com.example.firstgame.States.State;
@@ -24,7 +31,12 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+import static android.content.Context.CONNECTIVITY_SERVICE;
+
+
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
+
+    private String username = "";
 
     private MainThread mainThread;
     private State gameState,currentState;
@@ -43,8 +55,53 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         handler = new Handler(width,height,this);
 
-        init();
+        username = getUsernameFromFile();
+
+        //TODO: ASK FOR USERNAME
+        if(username == null || username == ""){
+            getUsernameFromInput();
+        }else{
+            init();
+        }
+
     }
+
+    private void getUsernameFromInput(){
+
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Enter your nickname to continue");
+
+        // Set up the input
+        final EditText input = new EditText(getContext());
+        // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+        input.setInputType(InputType.TYPE_CLASS_TEXT);
+        builder.setView(input);
+
+        // Set up the buttons
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                username = input.getText().toString();
+                if(isInputValid(username)){
+                    saveUsername(username);
+                    init();
+                }else{
+                    getUsernameFromInput();
+                }
+            }
+        });
+
+        builder.setCancelable(false);
+        builder.show();
+    }
+
+    private boolean isInputValid(String user){
+        user = user.replace(" ","");
+        user = user.replace(".","");
+        if(user.length() > 0 ) return true;
+        else return false;
+    }
+
 
     private void init(){
         gameState = new GameState(handler);
@@ -159,7 +216,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         return Integer.parseInt(a);
     }
 
@@ -167,7 +223,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
      * Save highScore
      * @param str
      */
-    public void save(int str) {
+    public void saveScore(int str) {
         String text = ""+str;
         FileOutputStream fos = null;
 
@@ -191,6 +247,61 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    /**
+     * Get username from file (line 2)
+     * @return
+     */
+    public String getUsernameFromFile() {
+        String a="";
+        try {
+            FileInputStream file = getContext().openFileInput("fileU.txt");
+            InputStreamReader isr = new InputStreamReader(file);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String text;
+
+            if ((text = br.readLine()) != null) {
+                a = text;
+            }
+
+            file.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return a;
+    }
+
+    /**
+     * Save username
+     * @param str
+     */
+    public void saveUsername(String str) {
+        String text = str;
+        FileOutputStream fos = null;
+
+        try {
+            fos = getContext().openFileOutput("fileU.txt", getContext().MODE_PRIVATE);
+            fos.write(text.getBytes());
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
     public void pauseGame(){
         ((GameState)(this.gameState)).pauseGame();
     }
@@ -199,5 +310,24 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         ((GameState)(this.gameState)).resumeGame();
     }
 
+
+    /**
+     *  Check if there is internet connection
+     */
+    public boolean isConnected() {
+        ConnectivityManager manager = (ConnectivityManager) getContext().getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (info != null && info.isConnected()) {
+            return true;
+        } else {
+            return false;
+
+        }
+
+    }
+
+    public String getUsername(){
+        return this.username;
+    }
 
 }

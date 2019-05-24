@@ -1,7 +1,5 @@
 package com.example.firstgame.States;
 
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -10,6 +8,7 @@ import com.example.firstgame.Button;
 import com.example.firstgame.Entities.Entity;
 import com.example.firstgame.Entities.Player;
 import com.example.firstgame.Entities.SideWall;
+import com.example.firstgame.Firebase.Firebase;
 import com.example.firstgame.Handler;
 import com.example.firstgame.Input;
 import com.example.firstgame.MainActivity;
@@ -32,6 +31,7 @@ public class GameState extends State {
         super(handler);
         obstacleHandler = new ObstacleHandler(handler);
         highScore = this.handler.getGamePanel().getHighScore();
+        addToFirebase(highScore);
         
         gameOver = true;
         gameRunning = false;
@@ -50,7 +50,7 @@ public class GameState extends State {
 
     private void startGame(){
         handler.initEntities();
-        handler.addPlayer(new Player((int)(handler.getWidth() * 0.45),(int)(handler.getHeight() * 0.80),(int)(handler.getWidth() * 0.08),(int)(handler.getHeight() * 0.05),handler));
+        handler.addPlayer(new Player((int)(handler.getWidth() * 0.45),(int)(handler.getHeight() * 0.80),(int)(handler.getWidth() * 0.075),(int)(handler.getHeight() * 0.045),handler));
         handler.addEntity(new SideWall(0,0,(int)(handler.getWidth()*GameState.sideWallWidth),(int)(handler.getHeight()), handler));
         handler.addEntity(new SideWall((int)(handler.getWidth()*(0.95)),0,(int)(handler.getWidth()*(GameState.sideWallWidth)),(int)(handler.getHeight()),handler));
 
@@ -136,6 +136,8 @@ public class GameState extends State {
 
         }else{
             musicBtn.draw(canvas);
+            showHighScore(canvas);
+            showUsername(canvas);
         }
 
         if(gameOverScreen){ //When the player lose
@@ -173,8 +175,9 @@ public class GameState extends State {
 
 
         if(score > highScore) { //Save high-score
-            this.handler.getGamePanel().save(score);
+            this.handler.getGamePanel().saveScore(score);
             highScore = this.handler.getGamePanel().getHighScore();
+            addToFirebase(highScore);
         }
 
         try{
@@ -228,7 +231,18 @@ public class GameState extends State {
         paint.setTextSize(95);
         canvas.drawText("Game Over", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.30), paint);
         canvas.drawText("Score: " + score, (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.40), paint);
-        canvas.drawText("High Score: " + highScore, (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.50), paint);
+    }
+
+    /**
+     * Show Game over screen
+     * Shown when the player lose
+     * @param canvas
+     */
+    private void showHighScore(Canvas canvas){
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(65);
+        canvas.drawText("High Score: " + highScore, (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.90), paint);
 
     }
 
@@ -244,6 +258,17 @@ public class GameState extends State {
         canvas.drawText("Click to continue" , (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.50), paint);
     }
 
+    /**
+     * Show game pause screen
+     */
+    private void showUsername(Canvas canvas){
+        Paint paint = new Paint();
+        paint.setColor(Color.BLACK);
+        paint.setTextSize(60);
+        canvas.drawText(handler.getGamePanel().getUsername(), (int) (handler.getWidth() * 0.30), (int)(handler.getHeight() * 0.03), paint);
+    }
+
+
     public void pauseGame(){
         pause = true;
     }
@@ -258,5 +283,18 @@ public class GameState extends State {
 
     public ObstacleHandler getObstacleHandler(){
         return obstacleHandler;
+    }
+
+    /**
+     * Add high score to firebase if there is an interent connection;
+     * @param score
+     */
+    private void addToFirebase(int score){
+        if(handler.getGamePanel().isConnected()){
+            Firebase.addScore(this.handler.getGamePanel().getUsername(),score);
+        }else{
+            System.out.println("NO INTERNET");
+        }
+
     }
 }

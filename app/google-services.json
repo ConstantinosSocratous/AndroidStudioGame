@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "822840851559",
+    "firebase_url": "https://squareapp-86406.firebaseio.com",
+    "project_id": "squareapp-86406",
+    "storage_bucket": "squareapp-86406.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:822840851559:android:e22b0d227d9e95f9",
+        "android_client_info": {
+          "package_name": "cos.first.square"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "822840851559-5akuml5s6jb8aajp4mi4omee6b2p1698.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "cos.first.square",
+            "certificate_hash": "c1b961f8e94f644f137b78dbf0b94a98071082ab"
+          }
+        },
+        {
+          "client_id": "822840851559-pchv9q3llf7tbfqqoj7qt4nm76sml7k0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCayj_D12Akt30mq88skL3RIAPUAOly-a8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "822840851559-pchv9q3llf7tbfqqoj7qt4nm76sml7k0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
