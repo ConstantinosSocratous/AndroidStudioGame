@@ -24,8 +24,8 @@ public class GameState extends State {
     private boolean gameOver, gameRunning, welcomeScreen, instructions, gameOverScreen;
     private boolean pause = false;
     private int score,highScore;
-    private boolean musicMute = false;
     private Button pauseBtn, musicBtn;
+    private boolean[] levels = new boolean[7];
 
     public GameState(Handler handler){
         super(handler);
@@ -49,6 +49,11 @@ public class GameState extends State {
     }
 
     private void startGame(){
+
+        for(int i=0; i<levels.length; i++){
+            levels[i] = false;
+        }
+
         handler.initEntities();
         handler.addPlayer(new Player((int)(handler.getWidth() * 0.45),(int)(handler.getHeight() * 0.80),(int)(handler.getWidth() * 0.075),(int)(handler.getHeight() * 0.045),handler));
         handler.addEntity(new SideWall(0,0,(int)(handler.getWidth()*GameState.sideWallWidth),(int)(handler.getHeight()), handler));
@@ -103,21 +108,31 @@ public class GameState extends State {
         }
 
         //TODO: FIX WAY OF INCREASING ROADS;
-        if(score == 8) {
+        //LEVEL UPDATES
+        if(score == 8 && !levels[0]) {
             obstacleHandler.increaseRoadSize();
-            score++;
-        }else if(score == 16) {
+            levels[0] = true;
+        }else if(score == 17 && !levels[1]) {
             obstacleHandler.increaseRoadSize();
-            score++;
-        }else if(score == 34) {
-            obstacleHandler.increaseSpeed();
-            score++;
-        }else if(score == 60) {
+            levels[1] = true;
+        }else if(score == 35 && !levels[2]) {
+            obstacleHandler.increaseSpeed(4,1);
+            levels[2] = true;
+        }else if(score == 67 && !levels[3]) {
             obstacleHandler.increaseRoadSize();
-            score++;
-        }else if(score == 100) {
+            levels[3] = true;
+        }else if(score == 102 && !levels[4]) {
+            this.handler.getPlayer().setSpeed(this.handler.getPlayer().getSpeed() + 3);
+            obstacleHandler.increaseLowerSpeed(2);
+            levels[4] = true;
+        }else if(score == 130 && !levels[5]) {
             this.handler.getPlayer().setSpeed(this.handler.getPlayer().getSpeed() + 4);
-            score++;
+            obstacleHandler.increaseSpeed(5,3);
+            levels[5] = true;
+        }else if(score == 170 && !levels[6]) {
+            this.handler.getPlayer().setSpeed(this.handler.getPlayer().getSpeed() + 4);
+            obstacleHandler.increaseSpeed(5,0);
+            levels[6] = true;
         }
     }
 

@@ -34,7 +34,7 @@ public class ObstacleHandler {
     /**
      * Handles the creation of the obstacles
      */
-    //TODO: IMPROVE
+    //TODO: IMPROVE CREATION OF OBJECTS
     public void createObstacle(){
         int widthTemp = handler.getWidth();
         float roadWidth = (float)((widthTemp*0.90)/roadSize);
@@ -104,8 +104,13 @@ public class ObstacleHandler {
         speedUpper+= 6;
     }
 
-    public void increaseSpeed(int num){
-        speedUpper+= num;
+    public void increaseSpeed(int upper, int lower){
+        speedUpper+= upper;
+        speedLower+=lower;
+    }
+
+    public void increaseLowerSpeed(int num){
+        speedLower+=num;
     }
 
     public void resetSpeed(){

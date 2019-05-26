@@ -16,13 +16,19 @@ import android.os.Vibrator;
 import android.os.health.SystemHealthManager;
 import android.text.InputType;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.firstgame.Firebase.Firebase;
 import com.example.firstgame.States.GameState;
 import com.example.firstgame.States.State;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -30,11 +36,14 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
+
+    private ArrayList<String> nicknames = new ArrayList<>();
 
     private String username = "";
 
@@ -55,17 +64,31 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         handler = new Handler(width,height,this);
 
-        username = getUsernameFromFile();
+        Firebase.database.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
+                    nicknames.add(postSnapshot.getKey());
+                }
+            }
 
-        //TODO: ASK FOR USERNAME
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed, " + databaseError.getMessage());
+            }
+        });
+
+        username = getUsernameFromFile();
         if(username == null || username == ""){
             getUsernameFromInput();
         }else{
             init();
         }
-
     }
 
+    /**
+     * Request input from user
+     */
     private void getUsernameFromInput(){
 
         final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -95,11 +118,31 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         builder.show();
     }
 
+    /**
+     * Check if user string is valid
+     * @param user The input nickname
+     * @return
+     */
     private boolean isInputValid(String user){
+
+        if(!isConnected()){
+            Toast.makeText(getContext(), "No Internet Connection", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
         user = user.replace(" ","");
         user = user.replace(".","");
-        if(user.length() > 0 ) return true;
-        else return false;
+        if(user.length() > 1 ){
+            if(nicknames.contains(user)){
+                Toast.makeText(getContext(), "Nickname already exists", Toast.LENGTH_LONG).show();
+                return false;
+            }
+            return true;
+        }else{
+            Toast.makeText(getContext(), "Please enter a valid nickname", Toast.LENGTH_LONG).show();
+            return false;
+        }
+
     }
 
 
