@@ -1,8 +1,10 @@
 package com.example.firstgame;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -23,14 +25,10 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        game = new GamePanel(this);
-
         //Start music
         //TODO: SELECT RANDOMLY A MUSIC FILE
         music = MediaPlayer.create(MainActivity.this,R.raw.positive);
         music.start();
-
-        setContentView(game);
 
         //RESTART MUSIC WHEN FINISHED
         music.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
@@ -44,7 +42,11 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        game = new GamePanel(this);
+        setContentView(game);
     }
+
+
 
     @Override
     protected void onPause(){

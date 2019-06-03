@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class Player extends Entity {
 
-    private int speed = 20;
+    private int speed = 19;
     private boolean directionRight = true;
 
     public Player(int x, int y, int width, int height, Handler handler){

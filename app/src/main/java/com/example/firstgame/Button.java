@@ -37,7 +37,8 @@ public class Button {
 
     public boolean isClicked(){
         Rect temp = new Rect(Input.x, Input.y,Input.x + 3,Input.y + 3);
-        Rect thisRect = new Rect(x,y,x+width,y+height);
+        Bitmap bmp = BitmapFactory.decodeResource(handler.getGamePanel().getResources(),this.img);
+        Rect thisRect = new Rect(x,y,x+bmp.getWidth(),y+bmp.getHeight());
         if(thisRect.intersect(temp)) {
             return true;
         }

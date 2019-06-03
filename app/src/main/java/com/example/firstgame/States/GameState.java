@@ -24,7 +24,7 @@ public class GameState extends State {
     private boolean gameOver, gameRunning, welcomeScreen, instructions, gameOverScreen;
     private boolean pause = false;
     private int score,highScore;
-    private Button pauseBtn, musicBtn;
+    private Button pauseBtn, musicBtn,scoreBoard;
     private boolean[] levels = new boolean[7];
 
     public GameState(Handler handler){
@@ -43,8 +43,11 @@ public class GameState extends State {
         pauseBtn = new Button((int)(handler.getWidth() * 0.85),(int)(handler.getHeight() * 0.01),(int)(handler.getWidth() * 0.09),
                 (int)(handler.getHeight() * 0.07), handler, R.drawable.pause);
 
-        musicBtn = new Button((int)(handler.getWidth() * 0.06),(int)(handler.getHeight() * 0.01),(int)(handler.getWidth() * 0.09),
+        musicBtn = new Button((int)(handler.getWidth() * 0.01),(int)(handler.getHeight() * 0.01),(int)(handler.getWidth() * 0.09),
                 (int)(handler.getHeight() * 0.07), handler, R.drawable.music);
+
+        scoreBoard = new Button((int)(handler.getWidth() * 0.85),(int)(handler.getHeight() * 0.90),(int)(handler.getWidth() * 0.09),
+                (int)(handler.getHeight() * 0.07), handler, R.drawable.score);
 
     }
 
@@ -71,6 +74,11 @@ public class GameState extends State {
     }
 
     public void update(){
+        if(Input.isClicked && scoreBoard.isClicked() && !gameRunning){
+            this.handler.getGamePanel().setCurrentState(new ScoreBoardState(handler));
+            return;
+        }
+
         if(Input.isClicked && musicBtn.isClicked()){
             MainActivity.pauseMusic();
             try {
@@ -118,7 +126,7 @@ public class GameState extends State {
         }else if(score == 35 && !levels[2]) {
             obstacleHandler.increaseSpeed(4,1);
             levels[2] = true;
-        }else if(score == 67 && !levels[3]) {
+        }else if(score == 77 && !levels[3]) {
             obstacleHandler.increaseRoadSize();
             levels[3] = true;
         }else if(score == 102 && !levels[4]) {
@@ -153,6 +161,7 @@ public class GameState extends State {
             musicBtn.draw(canvas);
             showHighScore(canvas);
             showUsername(canvas);
+            scoreBoard.draw(canvas);
         }
 
         if(gameOverScreen){ //When the player lose
@@ -306,7 +315,7 @@ public class GameState extends State {
      */
     private void addToFirebase(int score){
         if(handler.getGamePanel().isConnected()){
-            Firebase.addScore(this.handler.getGamePanel().getUsername(),score);
+            this.handler.getGamePanel().getFirebase().addScore(this.handler.getGamePanel().getUsername(),score);
         }else{
             System.out.println("NO INTERNET");
         }

@@ -3,6 +3,7 @@ package com.example.firstgame;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -24,7 +25,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.firstgame.Firebase.Firebase;
+import com.example.firstgame.Firebase.User;
 import com.example.firstgame.States.GameState;
+import com.example.firstgame.States.ScoreBoardState;
 import com.example.firstgame.States.State;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -37,23 +40,27 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
+
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
 
 
 public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
-    private ArrayList<String> nicknames = new ArrayList<>();
 
     private String username = "";
-
+    private Firebase firebase;
     private MainThread mainThread;
     private State gameState,currentState;
     private Handler handler;
     private int width,height;
-    
+
     public GamePanel(Context context){
         super(context);
+        firebase = new Firebase();
+        firebase.start();
+
         getHolder().addCallback(this);
         mainThread = new MainThread(getHolder(),this);
         setFocusable(true);
@@ -64,26 +71,17 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         handler = new Handler(width,height,this);
 
-        Firebase.database.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                for (DataSnapshot postSnapshot: snapshot.getChildren()) {
-                    nicknames.add(postSnapshot.getKey());
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed, " + databaseError.getMessage());
-            }
-        });
-
         username = getUsernameFromFile();
         if(username == null || username == ""){
             getUsernameFromInput();
         }else{
             init();
         }
+    }
+
+    private void init(){
+        gameState = new GameState(handler);
+        currentState = gameState;
     }
 
     /**
@@ -133,7 +131,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         user = user.replace(" ","");
         user = user.replace(".","");
         if(user.length() > 1 ){
-            if(nicknames.contains(user)){
+            if(firebase.getNicknames().contains(user)){
                 Toast.makeText(getContext(), "Nickname already exists", Toast.LENGTH_LONG).show();
                 return false;
             }
@@ -143,12 +141,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             return false;
         }
 
-    }
-
-
-    private void init(){
-        gameState = new GameState(handler);
-        currentState = gameState;
     }
 
     @Override
@@ -366,11 +358,17 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             return false;
 
         }
-
     }
 
     public String getUsername(){
         return this.username;
     }
 
+    public ArrayList<User> getUsers(){
+        return firebase.getUsers();
+    }
+
+    public Firebase getFirebase() {
+        return firebase;
+    }
 }
