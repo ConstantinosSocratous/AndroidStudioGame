@@ -17,7 +17,7 @@ import com.example.firstgame.R;
 
 public class GameState extends State {
 
-    public final static float sideWallWidth = 0.05f;
+    private final static float sideWallWidth = 0.05f;
     private final int eachPoint = 1;
 
     private ObstacleHandler obstacleHandler;
@@ -32,10 +32,10 @@ public class GameState extends State {
         obstacleHandler = new ObstacleHandler(handler);
         highScore = this.handler.getGamePanel().getHighScore();
         addToFirebase(highScore);
-        
+
         gameOver = true;
         gameRunning = false;
-        
+
         welcomeScreen = true;
         instructions = true;
         gameOverScreen = false;

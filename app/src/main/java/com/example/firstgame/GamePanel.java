@@ -283,7 +283,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     /**
-     * Get username from file (line 2)
+     * Get username from file
      * @return
      */
     public String getUsernameFromFile() {
@@ -335,7 +335,6 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
     }
-
 
     public void pauseGame(){
         ((GameState)(this.gameState)).pauseGame();
