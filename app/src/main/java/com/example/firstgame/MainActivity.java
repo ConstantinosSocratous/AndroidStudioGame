@@ -21,8 +21,9 @@ public class MainActivity extends Activity {
     private static boolean isMuted = false;
 
     private GamePanel game;
-    private VideoView video;
-    private int stopPosition=0;
+    private VideoView video,intro;
+    private int stopPosition=0, introStop=0;
+    private boolean showIntro=true, showTutorial=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,38 +32,29 @@ public class MainActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         game = new GamePanel(this);
-
-        if(isTutorialSeen()){   //CHECK IF TUTORIAL IS SEEN
-            try {
-                setContentView(game);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }else{
-            //Show tutorial video
-            setContentView(R.layout.activity_main);
-            video = (VideoView) findViewById(R.id.videoView);
-            String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.tutuorial;
-            Uri uri = Uri.parse(uriPath);
-            try{
-                video.setVideoURI(uri);
-                video.requestFocus();
-                video.start();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-            video.setOnCompletionListener(new MediaPlayer.OnCompletionListener()
-            {
-                public void onCompletion(MediaPlayer mp) {
-                    setTutorialToSeen("1");
-                    setContentView(game);
-                }
-            });
-
+        //setTutorialToSeen("0");
+        //------------------------------------\\
+        setContentView(R.layout.activity_main);
+        intro = (VideoView) findViewById(R.id.videoView);
+        String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.intro;
+        Uri uri = Uri.parse(uriPath);
+        try{
+            intro.setVideoURI(uri);
+            intro.requestFocus();
+            intro.start();
+        }catch (Exception e){
+            e.printStackTrace();
         }
 
-        //-------------------------\\
+        intro.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            public void onCompletion(MediaPlayer mp) {
+                showTutorial = true;
+                showIntro = false;
+                showTutorial();
+            }
+        });
+
+        //-----------------------------------\\
 
         //Start music
         //TODO: SELECT RANDOMLY A MUSIC FILE
@@ -84,17 +76,51 @@ public class MainActivity extends Activity {
 
     }
 
+    private void showTutorial(){
+        if(isTutorialSeen()){   //CHECK IF TUTORIAL IS SEEN
+            try {
+                setContentView(game);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }else{
+            //Show tutorial video
+            setContentView(R.layout.activity_main);
+            video = (VideoView) findViewById(R.id.videoView);
+            String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.tutuorial;
+            Uri uri = Uri.parse(uriPath);
+            try{
+                video.setVideoURI(uri);
+                video.requestFocus();
+                video.start();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
 
+            video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                public void onCompletion(MediaPlayer mp) {
+                    setTutorialToSeen("1");
+                    setContentView(game);
+                }
+            });
+        }
+    }
 
     @Override
     protected void onPause(){
         super.onPause();
         music.pause();
 
-        if(!isTutorialSeen()) {
+        if(!isTutorialSeen() && showTutorial) {
             stopPosition = video.getCurrentPosition(); //stopPosition is an int
             video.pause();
         }
+
+        if(showIntro){
+            introStop = intro.getCurrentPosition();
+            intro.pause();
+        }
+
     }
 
     @Override
@@ -107,9 +133,14 @@ public class MainActivity extends Activity {
             music.start();
         }
 
-        if(!isTutorialSeen()) {
+        if(!isTutorialSeen() && showTutorial) {
             video.seekTo(stopPosition);
             video.start();
+        }
+
+        if(showIntro){
+            intro.seekTo(introStop);
+            intro.start();
         }
     }
 
@@ -126,7 +157,7 @@ public class MainActivity extends Activity {
     //---------------------------------\\
 
     /**
-     * Get username from file
+     * Check if tutorial is seen
      * @return
      */
     public boolean isTutorialSeen() {
@@ -157,7 +188,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * Save username
+     * Set tutorial to seen
      */
     public void setTutorialToSeen(String str) {
         String text = str;
