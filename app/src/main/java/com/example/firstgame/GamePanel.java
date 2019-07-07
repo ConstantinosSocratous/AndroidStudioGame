@@ -27,6 +27,7 @@ import android.widget.Toast;
 import com.example.firstgame.Firebase.Firebase;
 import com.example.firstgame.Firebase.User;
 import com.example.firstgame.States.GameState;
+import com.example.firstgame.States.IntroState;
 import com.example.firstgame.States.ScoreBoardState;
 import com.example.firstgame.States.State;
 import com.google.firebase.database.DataSnapshot;
@@ -52,11 +53,11 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private String username = "";
     private Firebase firebase;
     private MainThread mainThread;
-    private State gameState,currentState;
+    private State gameState,currentState, introState;
     private Handler handler;
     private int width,height;
 
-    public GamePanel(Context context){
+    public GamePanel(Context context) {
         super(context);
         firebase = new Firebase();
         firebase.start();
@@ -71,6 +72,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
         handler = new Handler(width,height,this);
 
+
+
         username = getUsernameFromFile();
         if(username == null || username == ""){
             getUsernameFromInput();
@@ -80,8 +83,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void init(){
+        introState = new IntroState(handler);
         gameState = new GameState(handler);
-        currentState = gameState;
+        currentState = introState;
     }
 
     /**
@@ -336,6 +340,68 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+
+    /**
+     * Check if tutorial is seen
+     * @return
+     */
+    public boolean isTutorialSeen() {
+        String a="";
+        try {
+            FileInputStream file = getContext().openFileInput("tutorial.txt");
+            InputStreamReader isr = new InputStreamReader(file);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String text;
+
+            if ((text = br.readLine()) != null) {
+                a = text;
+            }
+
+            file.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        if(a.equals("1")){
+            return true;
+        }else{
+            return false;
+        }
+
+    }
+
+
+    /**
+     * Set tutorial to seen
+     */
+
+    public void setTutorialToSeen(String str) {
+        String text = str;
+        FileOutputStream fos = null;
+
+        try {
+            fos = getContext().openFileOutput("tutorial.txt", getContext().MODE_PRIVATE);
+            fos.write(text.getBytes());
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
     public void pauseGame(){
         ((GameState)(this.gameState)).pauseGame();
     }
@@ -369,5 +435,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
 
     public Firebase getFirebase() {
         return firebase;
+    }
+
+    public State getCurrentState(){
+        return this.currentState;
     }
 }

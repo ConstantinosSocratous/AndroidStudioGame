@@ -17,7 +17,7 @@ import com.example.firstgame.R;
 
 public class GameState extends State {
 
-    private final static float sideWallWidth = 0.05f;
+    public final static float sideWallWidth = 0.05f;
     private final int eachPoint = 1;
 
     private ObstacleHandler obstacleHandler;

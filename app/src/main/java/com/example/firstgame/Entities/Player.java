@@ -25,7 +25,7 @@ public class Player extends Entity {
     public void update(){
         if(!canMove) return;    //Check if can move
 
-        if(isCollisionWithObstacle()){  //Check if collision with obstacle
+        if(isCollisionWithObstacle() && handler.getGamePanel().getCurrentState().equals(this.handler.getGamePanel().getGameState())){  //Check if collision with obstacle
             handler.getGamePanel().getGameState().setGameOver();
             return;
         }
@@ -80,7 +80,7 @@ public class Player extends Entity {
      * Return true if there is collision with Obstacle
      * @return
      */
-    private boolean isCollisionWithObstacle(){
+    public boolean isCollisionWithObstacle(){
         ArrayList<Entity> entities = handler.getEntities();
         for(Entity entity: entities){
             if(entity instanceof Obstacle){

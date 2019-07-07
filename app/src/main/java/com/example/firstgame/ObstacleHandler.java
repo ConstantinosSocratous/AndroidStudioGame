@@ -20,7 +20,7 @@ public class ObstacleHandler {
     private Random random;
     private HashMap<Integer, Boolean> roads;
 
-    private float dimension = 0.10f;
+    public static final float dimension = 0.10f;
 
 
     public ObstacleHandler(Handler handler){

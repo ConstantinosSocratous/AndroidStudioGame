@@ -4,16 +4,11 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.VideoView;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 public class MainActivity extends Activity {
 
@@ -22,6 +17,7 @@ public class MainActivity extends Activity {
 
     private GamePanel game;
     private VideoView video,intro;
+
     private int stopPosition=0, introStop=0;
     private boolean showIntro=true, showTutorial=false;
 
@@ -32,11 +28,15 @@ public class MainActivity extends Activity {
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         game = new GamePanel(this);
-        //setTutorialToSeen("0");
+        setContentView(game);
+
         //------------------------------------\\
+        /*
+        setTutorialToSeen("0");
         setContentView(R.layout.activity_main);
         intro = (VideoView) findViewById(R.id.videoView);
-        String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.intro;
+
+        String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.intropic;
         Uri uri = Uri.parse(uriPath);
         try{
             intro.setVideoURI(uri);
@@ -53,7 +53,7 @@ public class MainActivity extends Activity {
                 showTutorial();
             }
         });
-
+        */
         //-----------------------------------\\
 
         //Start music
@@ -76,6 +76,7 @@ public class MainActivity extends Activity {
 
     }
 
+    /*
     private void showTutorial(){
         if(isTutorialSeen()){   //CHECK IF TUTORIAL IS SEEN
             try {
@@ -87,9 +88,12 @@ public class MainActivity extends Activity {
             //Show tutorial video
             setContentView(R.layout.activity_main);
             video = (VideoView) findViewById(R.id.videoView);
-            String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.tutuorial;
+
+
+            String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.tutorialavi;
             Uri uri = Uri.parse(uriPath);
             try{
+
                 video.setVideoURI(uri);
                 video.requestFocus();
                 video.start();
@@ -105,12 +109,14 @@ public class MainActivity extends Activity {
             });
         }
     }
+    */
 
     @Override
     protected void onPause(){
         super.onPause();
         music.pause();
 
+        /*
         if(!isTutorialSeen() && showTutorial) {
             stopPosition = video.getCurrentPosition(); //stopPosition is an int
             video.pause();
@@ -119,7 +125,7 @@ public class MainActivity extends Activity {
         if(showIntro){
             introStop = intro.getCurrentPosition();
             intro.pause();
-        }
+        }*/
 
     }
 
@@ -133,6 +139,7 @@ public class MainActivity extends Activity {
             music.start();
         }
 
+        /*
         if(!isTutorialSeen() && showTutorial) {
             video.seekTo(stopPosition);
             video.start();
@@ -142,6 +149,7 @@ public class MainActivity extends Activity {
             intro.seekTo(introStop);
             intro.start();
         }
+        */
     }
 
     public static void pauseMusic(){
@@ -156,10 +164,12 @@ public class MainActivity extends Activity {
 
     //---------------------------------\\
 
+
     /**
      * Check if tutorial is seen
      * @return
      */
+    /*
     public boolean isTutorialSeen() {
         String a="";
         try {
@@ -186,10 +196,12 @@ public class MainActivity extends Activity {
         }
 
     }
+    */
 
     /**
      * Set tutorial to seen
      */
+    /*
     public void setTutorialToSeen(String str) {
         String text = str;
         FileOutputStream fos = null;
@@ -213,5 +225,6 @@ public class MainActivity extends Activity {
             }
         }
     }
+    */
 
 }
