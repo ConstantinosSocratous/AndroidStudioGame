@@ -11,15 +11,15 @@ import android.graphics.Rect;
 public class Button {
 
     private int x,y,width,height;
-    private Handler handler;
+    private MyHandler myHandler;
     private int img;
 
-    public Button(int x, int y, int width, int height, Handler handler, int img){
+    public Button(int x, int y, int width, int height, MyHandler myHandler, int img){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.handler = handler;
+        this.myHandler = myHandler;
         this.img = img;
     }
 
@@ -31,13 +31,13 @@ public class Button {
         Paint paint = new Paint();
         paint.setColor(Color.GREEN);
 
-        Bitmap bmp = BitmapFactory.decodeResource(handler.getGamePanel().getResources(),this.img);
+        Bitmap bmp = BitmapFactory.decodeResource(myHandler.getGamePanel().getResources(),this.img);
         canvas.drawBitmap(bmp, x,y, paint);
     }
 
     public boolean isClicked(){
         Rect temp = new Rect(Input.x, Input.y,Input.x + 3,Input.y + 3);
-        Bitmap bmp = BitmapFactory.decodeResource(handler.getGamePanel().getResources(),this.img);
+        Bitmap bmp = BitmapFactory.decodeResource(myHandler.getGamePanel().getResources(),this.img);
         Rect thisRect = new Rect(x,y,x+bmp.getWidth(),y+bmp.getHeight());
         if(thisRect.intersect(temp)) {
             return true;

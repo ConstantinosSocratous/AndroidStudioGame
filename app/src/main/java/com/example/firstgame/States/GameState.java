@@ -5,11 +5,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.example.firstgame.Button;
+import com.example.firstgame.Colors;
 import com.example.firstgame.Entities.Entity;
 import com.example.firstgame.Entities.Player;
 import com.example.firstgame.Entities.SideWall;
-import com.example.firstgame.Firebase.Firebase;
-import com.example.firstgame.Handler;
+import com.example.firstgame.GamePanel;
+import com.example.firstgame.MyHandler;
 import com.example.firstgame.Input;
 import com.example.firstgame.MainActivity;
 import com.example.firstgame.ObstacleHandler;
@@ -26,11 +27,14 @@ public class GameState extends State {
     private int score,highScore;
     private Button pauseBtn, musicBtn,scoreBoard;
     private boolean[] levels = new boolean[7];
+    private int timesLost=0;
 
-    public GameState(Handler handler){
-        super(handler);
-        obstacleHandler = new ObstacleHandler(handler);
-        highScore = this.handler.getGamePanel().getHighScore();
+    public GameState(MyHandler myHandler){
+        super(myHandler);
+
+
+        obstacleHandler = new ObstacleHandler(myHandler);
+        highScore = this.myHandler.getGamePanel().getHighScore();
         addToFirebase(highScore);
 
         gameOver = true;
@@ -40,14 +44,14 @@ public class GameState extends State {
         instructions = true;
         gameOverScreen = false;
 
-        pauseBtn = new Button((int)(handler.getWidth() * 0.85),(int)(handler.getHeight() * 0.01),(int)(handler.getWidth() * 0.09),
-                (int)(handler.getHeight() * 0.07), handler, R.drawable.pause);
+        pauseBtn = new Button((int)(myHandler.getWidth() * 0.85),(int)(myHandler.getHeight() * 0.01),(int)(myHandler.getWidth() * 0.09),
+                (int)(myHandler.getHeight() * 0.07), myHandler, R.drawable.pause);
 
-        musicBtn = new Button((int)(handler.getWidth() * 0.01),(int)(handler.getHeight() * 0.01),(int)(handler.getWidth() * 0.09),
-                (int)(handler.getHeight() * 0.07), handler, R.drawable.music);
+        musicBtn = new Button((int)(myHandler.getWidth() * 0.01),(int)(myHandler.getHeight() * 0.01),(int)(myHandler.getWidth() * 0.09),
+                (int)(myHandler.getHeight() * 0.07), myHandler, R.drawable.music);
 
-        scoreBoard = new Button((int)(handler.getWidth() * 0.85),(int)(handler.getHeight() * 0.90),(int)(handler.getWidth() * 0.09),
-                (int)(handler.getHeight() * 0.07), handler, R.drawable.score);
+        scoreBoard = new Button((int)(myHandler.getWidth() * 0.85),(int)(myHandler.getHeight() * 0.90),(int)(myHandler.getWidth() * 0.09),
+                (int)(myHandler.getHeight() * 0.07), myHandler, R.drawable.score);
 
     }
 
@@ -57,10 +61,10 @@ public class GameState extends State {
             levels[i] = false;
         }
 
-        handler.initEntities();
-        handler.addPlayer(new Player((int)(handler.getWidth() * 0.45),(int)(handler.getHeight() * 0.80),(int)(handler.getWidth() * 0.075),(int)(handler.getHeight() * 0.045),handler));
-        handler.addEntity(new SideWall(0,0,(int)(handler.getWidth()*GameState.sideWallWidth),(int)(handler.getHeight()), handler));
-        handler.addEntity(new SideWall((int)(handler.getWidth()*(0.95)),0,(int)(handler.getWidth()*(GameState.sideWallWidth)),(int)(handler.getHeight()),handler));
+        myHandler.initEntities();
+        myHandler.addPlayer(new Player((int)(myHandler.getWidth() * 0.45),(int)(myHandler.getHeight() * 0.80),(int)(myHandler.getWidth() * 0.075),(int)(myHandler.getHeight() * 0.045), myHandler));
+        myHandler.addEntity(new SideWall(0,0,(int)(myHandler.getWidth()*GameState.sideWallWidth),(int)(myHandler.getHeight()), myHandler));
+        myHandler.addEntity(new SideWall((int)(myHandler.getWidth()*(0.95)),0,(int)(myHandler.getWidth()*(GameState.sideWallWidth)),(int)(myHandler.getHeight()), myHandler));
 
         gameOver = false;
         gameRunning = true;
@@ -75,7 +79,7 @@ public class GameState extends State {
 
     public void update(){
         if(Input.isClicked && scoreBoard.isClicked() && !gameRunning){
-            this.handler.getGamePanel().setCurrentState(new ScoreBoardState(handler));
+            this.myHandler.getGamePanel().setCurrentState(new ScoreBoardState(myHandler));
             return;
         }
 
@@ -105,7 +109,7 @@ public class GameState extends State {
         }
 
         if(!pause) {
-            for (Entity entity : handler.getEntities()) {
+            for (Entity entity : myHandler.getEntities()) {
                 entity.update();
             }
         }
@@ -122,30 +126,40 @@ public class GameState extends State {
             levels[0] = true;
         }else if(score == 17 && !levels[1]) {
             obstacleHandler.increaseRoadSize();
+            obstacleHandler.setObstacleWidthHeight(0.065f);
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(2));
             levels[1] = true;
         }else if(score == 35 && !levels[2]) {
-            obstacleHandler.increaseSpeed(4,1);
+            obstacleHandler.increaseSpeed(3,0);
+            obstacleHandler.setObstacleWidthHeight(0.08f);
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(3));
             levels[2] = true;
         }else if(score == 77 && !levels[3]) {
             obstacleHandler.increaseRoadSize();
+            obstacleHandler.setObstacleWidthHeight(0.09f);
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(4));
             levels[3] = true;
         }else if(score == 102 && !levels[4]) {
-            this.handler.getPlayer().setSpeed(this.handler.getPlayer().getSpeed() + 3);
+            this.myHandler.getPlayer().setSpeed(this.myHandler.getPlayer().getSpeed() + 3);
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(2));
+            obstacleHandler.setObstacleWidthHeight(0.10f);
             obstacleHandler.increaseLowerSpeed(2);
             levels[4] = true;
         }else if(score == 130 && !levels[5]) {
-            this.handler.getPlayer().setSpeed(this.handler.getPlayer().getSpeed() + 4);
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(3));
+            this.myHandler.getPlayer().setSpeed(this.myHandler.getPlayer().getSpeed() + 4);
             obstacleHandler.increaseSpeed(5,3);
             levels[5] = true;
         }else if(score == 170 && !levels[6]) {
-            this.handler.getPlayer().setSpeed(this.handler.getPlayer().getSpeed() + 4);
+            this.myHandler.getPlayer().setSpeed(this.myHandler.getPlayer().getSpeed() + 4);
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(1));
             obstacleHandler.increaseSpeed(5,0);
             levels[6] = true;
         }
     }
 
     public void draw(Canvas canvas){
-        for(Entity entity: handler.getEntities() ){
+        for(Entity entity: myHandler.getEntities() ){
             entity.draw(canvas);
         }
 
@@ -153,7 +167,7 @@ public class GameState extends State {
             Paint paint = new Paint();
             paint.setColor(Color.BLACK);
             paint.setTextSize(100);
-            canvas.drawText("" + score, (int) (handler.getWidth() * 0.50), 100, paint);
+            canvas.drawText("" + score, (int) (myHandler.getWidth() * 0.50), 100, paint);
 
             pauseBtn.draw(canvas);  //Draw pause Button if game is running
 
@@ -188,6 +202,8 @@ public class GameState extends State {
     }
 
     public void setGameOver() {
+        timesLost++;
+
         this.gameOver = true;
         this.gameRunning = false;
 
@@ -195,22 +211,27 @@ public class GameState extends State {
         this.instructions = true;
 
         disableEntitiesToMove();
-        handler.getGamePanel().vibrate(500);
+        myHandler.getGamePanel().vibrate(500);
 
 
         if(score > highScore) { //Save high-score
-            this.handler.getGamePanel().saveScore(score);
-            highScore = this.handler.getGamePanel().getHighScore();
+            this.myHandler.getGamePanel().saveScore(score);
+            highScore = this.myHandler.getGamePanel().getHighScore();
             addToFirebase(highScore);
         }
 
         try{
             Thread.sleep(1000);
         }catch (Exception e){e.printStackTrace();}
+
+        //SHOW ADS
+        if(timesLost % 3 == 0)
+            GamePanel.handler.post(GamePanel.runnable);
+
     }
 
     private void disableEntitiesToMove(){
-        for(Entity entity: handler.getEntities()){
+        for(Entity entity: myHandler.getEntities()){
             entity.setCanMove(false);
         }
     }
@@ -228,7 +249,7 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(95);
-        canvas.drawText("Click to play", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.30), paint);
+        canvas.drawText("Click to play", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.30), paint);
     }
 
     /**
@@ -240,8 +261,8 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.WHITE);
         paint.setTextSize(70);
-        canvas.drawText("Click right or left", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.70), paint);
-        canvas.drawText("to define the direction", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.75), paint);
+        canvas.drawText("Click right or left", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.70), paint);
+        canvas.drawText("to define the direction", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.75), paint);
     }
 
     /**
@@ -253,8 +274,8 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(95);
-        canvas.drawText("Game Over", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.30), paint);
-        canvas.drawText("Score: " + score, (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.40), paint);
+        canvas.drawText("Game Over", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.30), paint);
+        canvas.drawText("Score: " + score, (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.40), paint);
     }
 
     /**
@@ -266,7 +287,7 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(65);
-        canvas.drawText("High Score: " + highScore, (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.90), paint);
+        canvas.drawText("High Score: " + highScore, (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.90), paint);
 
     }
 
@@ -277,9 +298,9 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(95);
-        canvas.drawText("Pause", (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.40), paint);
+        canvas.drawText("Pause", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.40), paint);
         paint.setTextSize(75);
-        canvas.drawText("Click to continue" , (int) (handler.getWidth() * 0.20), (int)(handler.getHeight() * 0.50), paint);
+        canvas.drawText("Click to continue" , (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.50), paint);
     }
 
     /**
@@ -289,7 +310,7 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(60);
-        canvas.drawText(handler.getGamePanel().getUsername(), (int) (handler.getWidth() * 0.30), (int)(handler.getHeight() * 0.03), paint);
+        canvas.drawText(myHandler.getGamePanel().getUsername(), (int) (myHandler.getWidth() * 0.30), (int)(myHandler.getHeight() * 0.03), paint);
     }
 
 
@@ -314,8 +335,8 @@ public class GameState extends State {
      * @param score
      */
     private void addToFirebase(int score){
-        if(handler.getGamePanel().isConnected()){
-            this.handler.getGamePanel().getFirebase().addScore(this.handler.getGamePanel().getUsername(),score);
+        if(myHandler.getGamePanel().isConnected()){
+            this.myHandler.getGamePanel().getFirebase().addScore(this.myHandler.getGamePanel().getUsername(),score);
         }else{
             System.out.println("NO INTERNET");
         }

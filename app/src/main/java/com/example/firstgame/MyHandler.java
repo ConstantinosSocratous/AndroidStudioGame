@@ -5,14 +5,14 @@ import com.example.firstgame.Entities.Player;
 
 import java.util.ArrayList;
 
-public class Handler {
+public class MyHandler {
 
     private ArrayList<Entity> entities;
     private GamePanel gamePanel;
     private Player player;
     private int width,height;
 
-    public Handler(int w, int h, GamePanel gamePanel){
+    public MyHandler(int w, int h, GamePanel gamePanel){
         entities = new ArrayList<>();
         this.width = w;
         this.height = h;

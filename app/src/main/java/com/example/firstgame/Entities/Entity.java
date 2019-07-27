@@ -1,25 +1,23 @@
 package com.example.firstgame.Entities;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
 import android.graphics.Rect;
 
-import com.example.firstgame.Handler;
+import com.example.firstgame.MyHandler;
 
 public class Entity {
 
     protected int x,y,width,height;
-    protected Handler handler;
+    protected MyHandler myHandler;
     protected boolean toBeRemoved = false;
     protected boolean canMove = true;
 
-    public Entity(int x, int y, int width, int height, Handler handler){
+    public Entity(int x, int y, int width, int height, MyHandler myHandler){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.handler = handler;
+        this.myHandler = myHandler;
     }
 
     /**

@@ -1,23 +1,18 @@
 package com.example.firstgame.States;
 
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
-import android.util.Log;
 
 import com.example.firstgame.Button;
-import com.example.firstgame.Firebase.Firebase;
 import com.example.firstgame.Firebase.User;
-import com.example.firstgame.Handler;
+import com.example.firstgame.MyHandler;
 import com.example.firstgame.Input;
-import com.example.firstgame.MainActivity;
 import com.example.firstgame.R;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
 import java.util.PriorityQueue;
 
 public class ScoreBoardState extends State {
@@ -28,22 +23,22 @@ public class ScoreBoardState extends State {
     private Button next,previous,back;
     private int width,height;
 
-    public ScoreBoardState(Handler handler) {
-        super(handler);
+    public ScoreBoardState(MyHandler myHandler) {
+        super(myHandler);
 
-//        next = new Button((int) (handler.getWidth() * 0.85), (int) (handler.getHeight() * 0.90), (int) (handler.getWidth() * 0.09),
-//                (int) (handler.getHeight() * 0.07), handler, R.drawable.next);
+//        next = new Button((int) (myHandler.getWidth() * 0.85), (int) (myHandler.getHeight() * 0.90), (int) (myHandler.getWidth() * 0.09),
+//                (int) (myHandler.getHeight() * 0.07), myHandler, R.drawable.next);
 //
-//        previous = new Button((int) (handler.getWidth() * 0.08), (int) (handler.getHeight() * 0.90), (int) (handler.getWidth() * 0.10),
-//                (int) (handler.getHeight() * 0.10), handler, R.drawable.previous);
+//        previous = new Button((int) (myHandler.getWidth() * 0.08), (int) (myHandler.getHeight() * 0.90), (int) (myHandler.getWidth() * 0.10),
+//                (int) (myHandler.getHeight() * 0.10), myHandler, R.drawable.previous);
 
-        back = new Button((int) (handler.getWidth() * 0.01), (int) (handler.getHeight() * 0.01), (int) (handler.getWidth() * 0.05),
-                (int) (handler.getHeight() * 0.05), handler, R.drawable.exit);
+        back = new Button((int) (myHandler.getWidth() * 0.01), (int) (myHandler.getHeight() * 0.01), (int) (myHandler.getWidth() * 0.05),
+                (int) (myHandler.getHeight() * 0.05), myHandler, R.drawable.exit);
 
-        width = this.handler.getWidth();
-        height = this.handler.getHeight();
+        width = this.myHandler.getWidth();
+        height = this.myHandler.getHeight();
 
-        if(handler.getGamePanel().isConnected()) {
+        if(myHandler.getGamePanel().isConnected()) {
             readUsers();
             isConnectedToInternet = true;
         }else{
@@ -55,7 +50,7 @@ public class ScoreBoardState extends State {
      * Put users in decreasing order based on their score
      */
     private void readUsers(){
-        ArrayList<User> temp = this.handler.getGamePanel().getUsers();
+        ArrayList<User> temp = this.myHandler.getGamePanel().getUsers();
         try {
             users = new PriorityQueue<User>(temp.size(), new UserComparator());
         }catch (Exception e){
@@ -78,10 +73,10 @@ public class ScoreBoardState extends State {
     @Override
     public void update() {
         if (Input.isClicked && back.isClicked()) {
-            this.handler.getGamePanel().setCurrentState(this.handler.getGamePanel().getGameState());
+            this.myHandler.getGamePanel().setCurrentState(this.myHandler.getGamePanel().getGameState());
 
-            if(handler.getGamePanel().isConnected()) {
-                this.handler.getGamePanel().getFirebase().start();
+            if(myHandler.getGamePanel().isConnected()) {
+                this.myHandler.getGamePanel().getFirebase().start();
             }
 
             try {
@@ -128,7 +123,7 @@ public class ScoreBoardState extends State {
 
             if(startHeight > (int)(height*0.93))break;
 
-            if(user.getName().equals(this.handler.getGamePanel().getUsername())){
+            if(user.getName().equals(this.myHandler.getGamePanel().getUsername())){
                 paint.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.BOLD));
                 myPositionShown = true;
             }
@@ -145,7 +140,7 @@ public class ScoreBoardState extends State {
 
         if(!myPositionShown){
             for (int i=1; i< usersList.size(); i++){
-                if(usersList.get(i).getName().equals(this.handler.getGamePanel().getUsername())){
+                if(usersList.get(i).getName().equals(this.myHandler.getGamePanel().getUsername())){
                     paint.setTextSize(50);
                     canvas.drawText("My position: "+i,(int)(width*0.40),(int)(height*0.03),paint);
                 }

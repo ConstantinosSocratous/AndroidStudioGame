@@ -4,10 +4,18 @@ import android.app.Activity;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.VideoView;
+
+import com.google.android.gms.ads.InterstitialAd;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.ads.AdRequest;
 
 
 public class MainActivity extends Activity {
@@ -16,10 +24,6 @@ public class MainActivity extends Activity {
     private static boolean isMuted = false;
 
     private GamePanel game;
-    private VideoView video,intro;
-
-    private int stopPosition=0, introStop=0;
-    private boolean showIntro=true, showTutorial=false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,34 +31,17 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 
-        game = new GamePanel(this);
+        MobileAds.initialize(this,
+                "ca-app-pub-7737590834918939~1600807424");
+
+        InterstitialAd mInterstitialAd = new InterstitialAd(this);
+        //mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+        mInterstitialAd.setAdUnitId("ca-app-pub-7737590834918939/7760797763");
+        mInterstitialAd.loadAd(new AdRequest.Builder().build());
+
+        game = new GamePanel(this, new Handler(this.getMainLooper()),mInterstitialAd );
         setContentView(game);
 
-        //------------------------------------\\
-        /*
-        setTutorialToSeen("0");
-        setContentView(R.layout.activity_main);
-        intro = (VideoView) findViewById(R.id.videoView);
-
-        String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.intropic;
-        Uri uri = Uri.parse(uriPath);
-        try{
-            intro.setVideoURI(uri);
-            intro.requestFocus();
-            intro.start();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        intro.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            public void onCompletion(MediaPlayer mp) {
-                showTutorial = true;
-                showIntro = false;
-                showTutorial();
-            }
-        });
-        */
-        //-----------------------------------\\
 
         //Start music
         //TODO: SELECT RANDOMLY A MUSIC FILE
@@ -76,56 +63,11 @@ public class MainActivity extends Activity {
 
     }
 
-    /*
-    private void showTutorial(){
-        if(isTutorialSeen()){   //CHECK IF TUTORIAL IS SEEN
-            try {
-                setContentView(game);
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        }else{
-            //Show tutorial video
-            setContentView(R.layout.activity_main);
-            video = (VideoView) findViewById(R.id.videoView);
-
-
-            String uriPath = "android.resource://" + getPackageName() + "/" + R.raw.tutorialavi;
-            Uri uri = Uri.parse(uriPath);
-            try{
-
-                video.setVideoURI(uri);
-                video.requestFocus();
-                video.start();
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-
-            video.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                public void onCompletion(MediaPlayer mp) {
-                    setTutorialToSeen("1");
-                    setContentView(game);
-                }
-            });
-        }
-    }
-    */
 
     @Override
     protected void onPause(){
         super.onPause();
         music.pause();
-
-        /*
-        if(!isTutorialSeen() && showTutorial) {
-            stopPosition = video.getCurrentPosition(); //stopPosition is an int
-            video.pause();
-        }
-
-        if(showIntro){
-            introStop = intro.getCurrentPosition();
-            intro.pause();
-        }*/
 
     }
 
@@ -139,17 +81,6 @@ public class MainActivity extends Activity {
             music.start();
         }
 
-        /*
-        if(!isTutorialSeen() && showTutorial) {
-            video.seekTo(stopPosition);
-            video.start();
-        }
-
-        if(showIntro){
-            intro.seekTo(introStop);
-            intro.start();
-        }
-        */
     }
 
     public static void pauseMusic(){
@@ -162,69 +93,5 @@ public class MainActivity extends Activity {
         }
     }
 
-    //---------------------------------\\
-
-
-    /**
-     * Check if tutorial is seen
-     * @return
-     */
-    /*
-    public boolean isTutorialSeen() {
-        String a="";
-        try {
-            FileInputStream file = game.getContext().openFileInput("tutorial.txt");
-            InputStreamReader isr = new InputStreamReader(file);
-            BufferedReader br = new BufferedReader(isr);
-            StringBuilder sb = new StringBuilder();
-            String text;
-
-            if ((text = br.readLine()) != null) {
-                a = text;
-            }
-
-            file.close();
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        if(a.equals("1")){
-            return true;
-        }else{
-            return false;
-        }
-
-    }
-    */
-
-    /**
-     * Set tutorial to seen
-     */
-    /*
-    public void setTutorialToSeen(String str) {
-        String text = str;
-        FileOutputStream fos = null;
-
-        try {
-            fos = game.getContext().openFileOutput("tutorial.txt", game.getContext().MODE_PRIVATE);
-            fos.write(text.getBytes());
-
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (fos != null) {
-                try {
-                    fos.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
-    */
 
 }

@@ -1,11 +1,10 @@
 package com.example.firstgame.Entities;
 
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 
 import com.example.firstgame.Colors;
-import com.example.firstgame.Handler;
+import com.example.firstgame.MyHandler;
 
 import java.util.Random;
 
@@ -15,9 +14,10 @@ public class Obstacle extends Entity {
     private int color;
     private int road;
 
-    public Obstacle(int x, int y, int width, int height, Handler handler, int speed, int road) {
-        super(x, y, width, height, handler);
-        color = pickRandomColor();
+    public Obstacle(int x, int y, int width, int height, MyHandler myHandler, int speed, int road, int color) {
+        super(x, y, width, height, myHandler);
+        this.color = color;
+        //color = pickRandomColor();
         this.speed = speed;
         this.road = road;
     }
@@ -31,7 +31,7 @@ public class Obstacle extends Entity {
 
         y += speed;
 
-        if(y > handler.getHeight()){
+        if(y > myHandler.getHeight()){
             toBeRemoved = true;
         }
 
@@ -45,6 +45,7 @@ public class Obstacle extends Entity {
         Paint paint = new Paint();
         paint.setColor(color);
 
+        //canvas.drawCircle(x,y,width,paint);
         canvas.drawRect(x,y,x+width,y+height,paint);
     }
 

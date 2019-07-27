@@ -3,18 +3,14 @@ package com.example.firstgame;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.os.Handler;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.os.health.SystemHealthManager;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -28,11 +24,10 @@ import com.example.firstgame.Firebase.Firebase;
 import com.example.firstgame.Firebase.User;
 import com.example.firstgame.States.GameState;
 import com.example.firstgame.States.IntroState;
-import com.example.firstgame.States.ScoreBoardState;
 import com.example.firstgame.States.State;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
+import com.google.android.gms.ads.AdListener;
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.InterstitialAd;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -41,7 +36,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 
 import static android.content.Context.CONNECTIVITY_SERVICE;
@@ -54,11 +48,37 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     private Firebase firebase;
     private MainThread mainThread;
     private State gameState,currentState, introState;
-    private Handler handler;
+    private MyHandler myHandler;
     private int width,height;
 
-    public GamePanel(Context context) {
+    public static Handler handler;
+    public static InterstitialAd ad;
+    public static Runnable runnable;
+
+
+    public GamePanel(Context context, Handler handler, InterstitialAd ad) {
         super(context);
+        GamePanel.handler = handler;
+        GamePanel.ad = ad;
+
+        GamePanel.ad.setAdListener(new AdListener(){
+            @Override
+            public void onAdClosed(){
+                GamePanel.ad.loadAd(new AdRequest.Builder().build());
+            }
+        });
+        GamePanel.runnable = new Runnable() {
+            @Override
+            public void run() {
+                if (GamePanel.ad.isLoaded() && isConnected()) {
+                    GamePanel.ad.show();
+                } else {
+                    Log.e("ERROR", "AD NOT LOADED");
+                }
+            }
+        };
+
+
         firebase = new Firebase();
         firebase.start();
 
@@ -70,7 +90,7 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         width = metrics.widthPixels;
         height = metrics.heightPixels;
 
-        handler = new Handler(width,height,this);
+        myHandler = new MyHandler(width,height,this);
 
 
 
@@ -83,8 +103,8 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     private void init(){
-        introState = new IntroState(handler);
-        gameState = new GameState(handler);
+        introState = new IntroState(myHandler);
+        gameState = new GameState(myHandler);
         currentState = introState;
     }
 
@@ -182,9 +202,9 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         Input.x = (int) event.getX();
         Input.y = (int) event.getY();
 
-        if(event.getX() > (handler.getWidth() * 0.5) ){
+        if(event.getX() > (myHandler.getWidth() * 0.5) ){
             Input.left = false;
-        }else if(event.getX() <= (handler.getWidth() * 0.5) ){
+        }else if(event.getX() <= (myHandler.getWidth() * 0.5) ){
             Input.left = true;
         }
 

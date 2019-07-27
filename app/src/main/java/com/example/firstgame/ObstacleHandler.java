@@ -1,7 +1,5 @@
 package com.example.firstgame;
 
-import android.graphics.Color;
-
 import com.example.firstgame.Entities.Entity;
 import com.example.firstgame.Entities.Obstacle;
 
@@ -14,17 +12,19 @@ public class ObstacleHandler {
     private final int decreaseSpeedNum = 7;
     private boolean isSpeedDecreased = false;
 
-    private int speedUpper = 25, speedLower = 10;
-    private Handler handler;
+    private int speedUpper = 20, speedLower = 10;
+    private MyHandler myHandler;
     private int roadSize = 3;   //3-7
     private Random random;
     private HashMap<Integer, Boolean> roads;
+    private int currentColor;
 
     public static final float dimension = 0.10f;
+    private float obstacleWidthHeight = 0.05f;
 
 
-    public ObstacleHandler(Handler handler){
-        this.handler = handler;
+    public ObstacleHandler(MyHandler myHandler){
+        this.myHandler = myHandler;
         random = new Random();
         roads  =  new HashMap<Integer,Boolean>();
 
@@ -36,7 +36,7 @@ public class ObstacleHandler {
      */
     //TODO: IMPROVE CREATION OF OBJECTS
     public void createObstacle(){
-        int widthTemp = handler.getWidth();
+        int widthTemp = myHandler.getWidth();
         float roadWidth = (float)((widthTemp*0.90)/roadSize);
         float roadWidthPercentage = (roadWidth/widthTemp);
         int bound = (int)(roadWidth - (widthTemp*0.10));
@@ -54,12 +54,12 @@ public class ObstacleHandler {
                 //Calculate y
                 float y = random.nextInt(40) + 10;
                 y = y/100;
-                y = - (handler.getHeight() * (y));
+                y = - (myHandler.getHeight() * (y));
 
                 if(x > widthTemp*0.90) continue;
 
-                handler.addEntity(new Obstacle(x , (int)y, (int) (handler.getWidth() * (dimension)),
-                        (int) (handler.getHeight() * (dimension)), handler, speed,num));
+                myHandler.addEntity(new Obstacle(x , (int)y, (int) (myHandler.getWidth() * (obstacleWidthHeight)),
+                        (int) (myHandler.getHeight() * (dimension)), myHandler, speed,num, currentColor));
 
                 roads.put(num,true);
 
@@ -69,7 +69,7 @@ public class ObstacleHandler {
 
     public void removeObjects(){
         ArrayList<Entity> temp = new ArrayList<>();
-        for(Entity entity: handler.getEntities()){
+        for(Entity entity: myHandler.getEntities()){
             if(entity.isToBeRemoved()){
                 temp.add(entity);
             }
@@ -77,8 +77,8 @@ public class ObstacleHandler {
 
         for(Entity entity: temp){
             roads.put(((Obstacle) entity).getRoad(),false);
-            handler.removeEntity(entity);
-            handler.getGamePanel().getGameState().increaseScore();  //Increase score for every obstacle that is removed
+            myHandler.removeEntity(entity);
+            myHandler.getGamePanel().getGameState().increaseScore();  //Increase score for every obstacle that is removed
         }
     }
 
@@ -89,6 +89,16 @@ public class ObstacleHandler {
         roadSize = 3;
         speedLower=10;
         speedUpper=25;
+        currentColor = Colors.ALL_COLORS.get(1);
+        obstacleWidthHeight = 0.05f;
+    }
+
+    public void setObstacleWidthHeight(float num){
+        this.obstacleWidthHeight = num;
+    }
+
+    public void setCurrentColor(int color){
+        this.currentColor = color;
     }
 
     public int getRoadSize(){

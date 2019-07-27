@@ -4,12 +4,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 
-import com.example.firstgame.Handler;
+import com.example.firstgame.MyHandler;
 
 public class SideWall extends Entity {
 
-    public SideWall(int x, int y, int width, int height, Handler handler){
-        super(x,y,width,height,handler);
+    public SideWall(int x, int y, int width, int height, MyHandler myHandler){
+        super(x,y,width,height, myHandler);
     }
 
     /**

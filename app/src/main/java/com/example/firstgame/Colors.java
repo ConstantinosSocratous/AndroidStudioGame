@@ -11,6 +11,7 @@ public class Colors {
         put(1,Color.GRAY);
         put(2,Color.rgb(160,00,55));
         put(3,Color.rgb(34,98,12));
+        put(4,Color.rgb(32, 98, 98));
     }};
 
     public Colors(){}
