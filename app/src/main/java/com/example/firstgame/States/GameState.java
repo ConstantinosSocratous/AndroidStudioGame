@@ -160,17 +160,16 @@ public class GameState extends State {
             levels[3] = true;
         }else if(score == 102 && !levels[4]) {
             this.myHandler.getPlayer().setSpeed(this.myHandler.getPlayer().getSpeed() + 3);
-            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(2));
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(5));
             obstacleHandler.increaseLowerSpeed(2);
             levels[4] = true;
         }else if(score == 130 && !levels[5]) {
-            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(3));
             this.myHandler.getPlayer().setSpeed(this.myHandler.getPlayer().getSpeed() + 4);
             obstacleHandler.increaseSpeed(5,3);
             levels[5] = true;
         }else if(score == 170 && !levels[6]) {
             this.myHandler.getPlayer().setSpeed(this.myHandler.getPlayer().getSpeed() + 4);
-            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(1));
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(6));
             obstacleHandler.increaseSpeed(5,0);
             levels[6] = true;
         }

@@ -6,11 +6,9 @@ import com.example.firstgame.Entities.Obstacle;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import java.util.Set;
 
 public class ObstacleHandler {
-
-    private final int decreaseSpeedNum = 7;
-    private boolean isSpeedDecreased = false;
 
     private int speedUpper = 18, speedLower = 10;
     private MyHandler myHandler;
@@ -41,7 +39,8 @@ public class ObstacleHandler {
         float roadWidthPercentage = (roadWidth/widthTemp);
         int bound = (int)(roadWidth - (widthTemp*obstacleWidthHeight));
 
-        for(Integer num : roads.keySet()){
+        Set<Integer> keyset = roads.keySet();
+        for(Integer num : keyset){
 
             if(! roads.get(num)){ //If the road is empty
                 int speed = random.nextInt(speedUpper) + speedLower;
@@ -100,10 +99,6 @@ public class ObstacleHandler {
         this.currentColor = color;
     }
 
-    public int getRoadSize(){
-        return roadSize;
-    }
-
     public void increaseRoadSize(){
         roadSize++;
         roads.put(roadSize,false);
@@ -122,15 +117,6 @@ public class ObstacleHandler {
         speedLower+=num;
     }
 
-    public void resetSpeed(){
-        speedUpper+= decreaseSpeedNum;
-        isSpeedDecreased = false;
-    }
-
-    public void decreaseSpeed(){
-        isSpeedDecreased = true;
-        speedUpper-= decreaseSpeedNum;
-    }
 
 
 

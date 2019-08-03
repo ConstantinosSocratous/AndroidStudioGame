@@ -114,7 +114,7 @@ public class ScoreBoardState extends State {
     private void drawPlayers(Canvas canvas){
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(60);
+        paint.setTextSize(55);
         paint.setTextAlign(Paint.Align.LEFT);
 
         int startHeight = (int)(height*0.15);
