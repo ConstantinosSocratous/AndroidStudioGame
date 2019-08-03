@@ -37,6 +37,7 @@ public class MainActivity extends Activity {
         InterstitialAd mInterstitialAd = new InterstitialAd(this);
         //mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
         mInterstitialAd.setAdUnitId("ca-app-pub-7737590834918939/7760797763");
+        //                             ca-app-pub-7737590834918939/7760797763
         mInterstitialAd.loadAd(new AdRequest.Builder().build());
 
         game = new GamePanel(this, new Handler(this.getMainLooper()),mInterstitialAd );

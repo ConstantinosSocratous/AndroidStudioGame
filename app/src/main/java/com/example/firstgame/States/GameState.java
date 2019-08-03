@@ -1,5 +1,7 @@
 package com.example.firstgame.States;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -25,7 +27,7 @@ public class GameState extends State {
     private boolean gameOver, gameRunning, welcomeScreen, instructions, gameOverScreen;
     private boolean pause = false;
     private int score,highScore;
-    private Button pauseBtn, musicBtn,scoreBoard;
+    private Button pauseBtn, musicBtn,scoreBoard, playBtn, resumeBtn;
     private boolean[] levels = new boolean[7];
     private int timesLost=0;
 
@@ -52,6 +54,14 @@ public class GameState extends State {
 
         scoreBoard = new Button((int)(myHandler.getWidth() * 0.85),(int)(myHandler.getHeight() * 0.90),(int)(myHandler.getWidth() * 0.09),
                 (int)(myHandler.getHeight() * 0.07), myHandler, R.drawable.score);
+
+        Bitmap bmp = BitmapFactory.decodeResource(myHandler.getGamePanel().getResources(),R.drawable.play);
+        playBtn = new Button((int)(myHandler.getWidth() * 0.5 - (bmp.getWidth()/2) ),(int)(myHandler.getHeight() * 0.5- (bmp.getHeight()/2) ),(int)(myHandler.getWidth() * 0.09),
+                (int)(myHandler.getHeight() * 0.07), myHandler, R.drawable.play);
+
+        Bitmap bmpResume = BitmapFactory.decodeResource(myHandler.getGamePanel().getResources(),R.drawable.resume);
+        resumeBtn = new Button((int)(myHandler.getWidth() * 0.5 - (bmpResume.getWidth()/2) ),(int)(myHandler.getHeight() * 0.5- (bmpResume.getHeight()/2) ),(int)(myHandler.getWidth() * 0.09),
+                (int)(myHandler.getHeight() * 0.07), myHandler, R.drawable.resume);
 
     }
 
@@ -83,21 +93,31 @@ public class GameState extends State {
             return;
         }
 
-        if(Input.isClicked && musicBtn.isClicked()){
+        if(Input.isClicked && musicBtn.isClicked() && (pause || !gameRunning)){
             MainActivity.pauseMusic();
+            if(musicBtn.getImg() == R.drawable.music){
+                musicBtn.setImg(R.drawable.musicoff);
+            }else{
+                musicBtn.setImg(R.drawable.music);
+            }
             try {
-                Thread.sleep(1000);
-            }catch (Exception e){
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
                 e.printStackTrace();
             }
             return;
         }
 
-        if(isGameOver() && Input.isClicked){
+        if(isGameOver() && playBtn.isClicked()){
             startGame();
         }
 
-        if(Input.isClicked){
+        if(Input.isClicked && resumeBtn.isClicked() && pause){
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
             pause = false;
         }
 
@@ -125,24 +145,22 @@ public class GameState extends State {
             obstacleHandler.increaseRoadSize();
             levels[0] = true;
         }else if(score == 17 && !levels[1]) {
-            obstacleHandler.increaseRoadSize();
-            obstacleHandler.setObstacleWidthHeight(0.065f);
+            obstacleHandler.increaseSpeed(3,0);
+            obstacleHandler.setObstacleWidthHeight(0.085f);
             obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(2));
             levels[1] = true;
-        }else if(score == 35 && !levels[2]) {
-            obstacleHandler.increaseSpeed(3,0);
-            obstacleHandler.setObstacleWidthHeight(0.08f);
+        }else if(score == 30 && !levels[2]) {
+            obstacleHandler.increaseRoadSize();
             obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(3));
             levels[2] = true;
         }else if(score == 77 && !levels[3]) {
             obstacleHandler.increaseRoadSize();
-            obstacleHandler.setObstacleWidthHeight(0.09f);
+            obstacleHandler.setObstacleWidthHeight(0.10f);
             obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(4));
             levels[3] = true;
         }else if(score == 102 && !levels[4]) {
             this.myHandler.getPlayer().setSpeed(this.myHandler.getPlayer().getSpeed() + 3);
             obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(2));
-            obstacleHandler.setObstacleWidthHeight(0.10f);
             obstacleHandler.increaseLowerSpeed(2);
             levels[4] = true;
         }else if(score == 130 && !levels[5]) {
@@ -166,9 +184,9 @@ public class GameState extends State {
         if(gameRunning) {   // If game running show score on top
             Paint paint = new Paint();
             paint.setColor(Color.BLACK);
-            paint.setTextSize(100);
-            canvas.drawText("" + score, (int) (myHandler.getWidth() * 0.50), 100, paint);
-
+            paint.setTextAlign(Paint.Align.CENTER);
+            paint.setTextSize(65);
+            canvas.drawText("" + score, (int) (myHandler.getWidth()/2), 100, paint);
             pauseBtn.draw(canvas);  //Draw pause Button if game is running
 
         }else{
@@ -176,23 +194,25 @@ public class GameState extends State {
             showHighScore(canvas);
             showUsername(canvas);
             scoreBoard.draw(canvas);
+            playBtn.draw(canvas);
         }
 
         if(gameOverScreen){ //When the player lose
             showGameOver(canvas);
         }
 
-        if(instructions){ //Show instructions
-            showInstructions(canvas);
-        }
+//        if(instructions){ //Show instructions
+//            showInstructions(canvas);
+//        }
 
-        if(welcomeScreen){ //Show welcome screen
-            showWelcomeScreen(canvas);
-        }
+//        if(welcomeScreen){ //Show welcome screen
+//            showWelcomeScreen(canvas);
+//        }
 
         if(pause){
-            showGamePause(canvas);
+            //showGamePause(canvas);
             musicBtn.draw(canvas);
+            resumeBtn.draw(canvas);
         }
     }
 
@@ -273,9 +293,10 @@ public class GameState extends State {
     private void showGameOver(Canvas canvas){
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(95);
-        canvas.drawText("Game Over", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.30), paint);
-        canvas.drawText("Score: " + score, (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.40), paint);
+        paint.setTextSize(70);
+        paint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("Game Over", (int) (myHandler.getWidth()/2), (int)(myHandler.getHeight() * 0.30), paint);
+        canvas.drawText("Score: " + score, (int) (myHandler.getWidth()/2), (int)(myHandler.getHeight() * 0.40), paint);
     }
 
     /**
@@ -287,7 +308,8 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(65);
-        canvas.drawText("High Score: " + highScore, (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.90), paint);
+        paint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText("High Score: " + highScore, (int) (myHandler.getWidth() /2), (int)(myHandler.getHeight() * 0.90), paint);
 
     }
 
@@ -297,10 +319,9 @@ public class GameState extends State {
     private void showGamePause(Canvas canvas){
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
-        paint.setTextSize(95);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setTextSize(65);
         canvas.drawText("Pause", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.40), paint);
-        paint.setTextSize(75);
-        canvas.drawText("Click to continue" , (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.50), paint);
     }
 
     /**
@@ -310,7 +331,8 @@ public class GameState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(60);
-        canvas.drawText(myHandler.getGamePanel().getUsername(), (int) (myHandler.getWidth() * 0.30), (int)(myHandler.getHeight() * 0.03), paint);
+        paint.setTextAlign(Paint.Align.CENTER);
+        canvas.drawText(myHandler.getGamePanel().getUsername(), (int) ((myHandler.getWidth() / 2)), (int)(myHandler.getHeight() * 0.04), paint);
     }
 
 
@@ -324,6 +346,9 @@ public class GameState extends State {
 
     public void resumeGame(){
         pause = false;
+    }
+    public boolean isPause(){
+        return pause;
     }
 
     public ObstacleHandler getObstacleHandler(){

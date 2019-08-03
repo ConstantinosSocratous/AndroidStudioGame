@@ -12,7 +12,7 @@ public class ObstacleHandler {
     private final int decreaseSpeedNum = 7;
     private boolean isSpeedDecreased = false;
 
-    private int speedUpper = 20, speedLower = 10;
+    private int speedUpper = 18, speedLower = 10;
     private MyHandler myHandler;
     private int roadSize = 3;   //3-7
     private Random random;
@@ -39,8 +39,7 @@ public class ObstacleHandler {
         int widthTemp = myHandler.getWidth();
         float roadWidth = (float)((widthTemp*0.90)/roadSize);
         float roadWidthPercentage = (roadWidth/widthTemp);
-        int bound = (int)(roadWidth - (widthTemp*0.10));
-
+        int bound = (int)(roadWidth - (widthTemp*obstacleWidthHeight));
 
         for(Integer num : roads.keySet()){
 
@@ -88,7 +87,7 @@ public class ObstacleHandler {
         }
         roadSize = 3;
         speedLower=10;
-        speedUpper=25;
+        speedUpper=18;
         currentColor = Colors.ALL_COLORS.get(1);
         obstacleWidthHeight = 0.05f;
     }

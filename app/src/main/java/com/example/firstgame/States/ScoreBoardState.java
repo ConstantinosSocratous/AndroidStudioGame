@@ -3,6 +3,7 @@ package com.example.firstgame.States;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Typeface;
 
 import com.example.firstgame.Button;
@@ -97,7 +98,7 @@ public class ScoreBoardState extends State {
         paint.setColor(Color.parseColor("#993333"));
         paint.setStyle(Paint.Style.STROKE);
         paint.setStrokeWidth(10f);
-        canvas.drawRect((int)(width*0.07),(int)(height*0.11),(int)(width*0.92),(int)(height*0.95),paint);
+        //canvas.drawRect((int)(width*0.07),(int)(height*0.11),(int)(width*0.92),(int)(height*0.95),paint);
 
         if(isConnectedToInternet) {
             drawPlayers(canvas);
@@ -114,6 +115,7 @@ public class ScoreBoardState extends State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(60);
+        paint.setTextAlign(Paint.Align.LEFT);
 
         int startHeight = (int)(height*0.15);
 
@@ -128,10 +130,11 @@ public class ScoreBoardState extends State {
                 myPositionShown = true;
             }
             //Draw Name
-            canvas.drawText(index + ")  " + user.getName(),(int)(width*0.12),startHeight,paint);
+            //if(paint.measureText(user.getName()) < (width*60)) {
+            canvas.drawText(index + ")  " + user.getName(), (int) (width * 0.03), startHeight, paint);
 
             //Draw Score
-            canvas.drawText(""+user.getScore(),(int)(width*0.80),startHeight,paint);
+            canvas.drawText(""+user.getScore(),(int)(width*0.83),startHeight,paint);
 
             startHeight += (int)(height*0.05);
             index++;
@@ -157,5 +160,39 @@ public class ScoreBoardState extends State {
                 return -1;
             return 0;
         }
+    }
+
+    /**
+     * Sets the text size for a Paint object so a given string of text will be a
+     * given width.
+     *
+     * @param paint
+     *            the Paint to set the text size for
+     * @param desiredWidth
+     *            the desired width
+     * @param text
+     *            the text that should be that width
+     */
+    private float setTextSizeForWidth(float desiredWidth,
+                                            String text) {
+
+        // Pick a reasonably large value for the test. Larger values produce
+        // more accurate results, but may cause problems with hardware
+        // acceleration. But there are workarounds for that, too; refer to
+        // http://stackoverflow.com/questions/6253528/font-size-too-large-to-fit-in-cache
+        final float testTextSize = 60f;
+
+        // Get the bounds of the text, using our testTextSize.
+        Paint p = new Paint();
+        p.setTextSize(testTextSize);
+        Rect bounds = new Rect();
+        p.getTextBounds(text, 0, text.length(), bounds);
+
+        // Calculate the desired size as a proportion of our testTextSize.
+        float desiredTextSize = testTextSize * desiredWidth / bounds.width();
+
+        return desiredTextSize;
+        // Set the paint for that size.
+
     }
 }

@@ -48,4 +48,8 @@ public class Button {
     public void setImg(int num){
         this.img = num;
     }
+
+    public int getImg(){
+        return this.img;
+    }
 }
