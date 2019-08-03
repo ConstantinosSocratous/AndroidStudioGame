@@ -1,6 +1,7 @@
 package com.example.firstgame;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,7 +43,7 @@ public class MainActivity extends Activity {
 
         game = new GamePanel(this, new Handler(this.getMainLooper()),mInterstitialAd );
         setContentView(game);
-
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         //Start music
         //TODO: SELECT RANDOMLY A MUSIC FILE

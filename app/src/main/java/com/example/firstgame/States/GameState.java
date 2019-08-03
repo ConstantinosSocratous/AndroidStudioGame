@@ -108,7 +108,7 @@ public class GameState extends State {
             return;
         }
 
-        if(isGameOver() && playBtn.isClicked()){
+        if(isGameOver() && playBtn.isClicked() && !gameRunning){
             startGame();
         }
 

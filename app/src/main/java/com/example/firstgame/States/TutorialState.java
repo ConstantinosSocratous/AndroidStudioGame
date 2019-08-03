@@ -61,29 +61,26 @@ public class TutorialState extends  State {
         Paint paint = new Paint();
         paint.setColor(Color.BLACK);
         paint.setTextSize(70);
+        paint.setTextAlign(Paint.Align.CENTER);
 
-
-
+        int x = (int)(myHandler.getWidth()/2);
         if(isBetween(numOfTicks,10,130)){
-            paint.setTextSize(80);
-            canvas.drawText("Welcome!", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.30), paint);
+            canvas.drawText("Welcome!", x, (int)(myHandler.getHeight() * 0.30), paint);
         }
         if(isBetween(numOfTicks,135, 350)){
-            paint.setTextSize(70);
-            canvas.drawText("Try clicking", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.30), paint);
-            canvas.drawText("left or right", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.37), paint);
-            canvas.drawText("to change the direction", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.44), paint);
-            canvas.drawText("of the square", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.52), paint);
+            canvas.drawText("Try clicking", x, (int)(myHandler.getHeight() * 0.30), paint);
+            canvas.drawText("left or right", x, (int)(myHandler.getHeight() * 0.37), paint);
+            canvas.drawText("to change the direction",x, (int)(myHandler.getHeight() * 0.44), paint);
+            canvas.drawText("of the square", x, (int)(myHandler.getHeight() * 0.52), paint);
         }
         if(isBetween(numOfTicks,360, 560)){
             paint.setTextSize(70);
-            canvas.drawText("Now click and hold", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.30), paint);
-            canvas.drawText("left or right", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.37), paint);
-            canvas.drawText("to stick to the walls", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.44), paint);
+            canvas.drawText("Now click and hold", x, (int)(myHandler.getHeight() * 0.30), paint);
+            canvas.drawText("left or right", x, (int)(myHandler.getHeight() * 0.37), paint);
+            canvas.drawText("to stick to the walls", x, (int)(myHandler.getHeight() * 0.44), paint);
         }
         if(isBetween(numOfTicks,570, 650)){
-            paint.setTextSize(70);
-            canvas.drawText("Now avoid the obstacles", (int) (myHandler.getWidth() * 0.10), (int)(myHandler.getHeight() * 0.10), paint);
+            canvas.drawText("Now avoid the obstacles", x, (int)(myHandler.getHeight() * 0.10), paint);
         }
 
         if(numOfTicks ==  550){
@@ -93,23 +90,22 @@ public class TutorialState extends  State {
 
         if(numOfTicks ==  750){
             myHandler.addEntity(new Obstacle((int)(myHandler.getWidth()*0.80) , (int)(-300), (int) (myHandler.getWidth() * (ObstacleHandler.dimension)),
-                    (int) (myHandler.getHeight() * (ObstacleHandler.dimension)), myHandler, 15,1, Colors.ALL_COLORS.get(1)));
+                    (int) (myHandler.getHeight() * (ObstacleHandler.dimension)), myHandler, 15,1, Colors.ALL_COLORS.get(2)));
         }
 
         if(numOfTicks ==  850){
             myHandler.addEntity(new Obstacle((int)(myHandler.getWidth()*0.50) , (int)(-300), (int) (myHandler.getWidth() * (ObstacleHandler.dimension)),
-                    (int) (myHandler.getHeight() * (ObstacleHandler.dimension)), myHandler, 15,1,Colors.ALL_COLORS.get(1)));
+                    (int) (myHandler.getHeight() * (ObstacleHandler.dimension)), myHandler, 15,1,Colors.ALL_COLORS.get(3)));
         }
 
         if(numOfTicks ==  940){
             myHandler.addEntity(new Obstacle((int)(myHandler.getWidth()*0.20) , (int)(-300), (int) (myHandler.getWidth() * (ObstacleHandler.dimension)),
-                    (int) (myHandler.getHeight() * (ObstacleHandler.dimension)), myHandler, 12,1,Colors.ALL_COLORS.get(1)));
+                    (int) (myHandler.getHeight() * (ObstacleHandler.dimension)), myHandler, 12,1,Colors.ALL_COLORS.get(4)));
         }
 
-        if(isBetween(numOfTicks,1070, 1250)){
-            paint.setTextSize(70);
-            canvas.drawText("Good job", (int) (myHandler.getWidth() * 0.10), (int)(myHandler.getHeight() * 0.30), paint);
-            canvas.drawText("Your are ready to play", (int) (myHandler.getWidth() * 0.10), (int)(myHandler.getHeight() * 0.37), paint);
+        if(isBetween(numOfTicks,1100, 1250)){
+            canvas.drawText("Good job", x, (int)(myHandler.getHeight() * 0.30), paint);
+            canvas.drawText("You are ready to play",x, (int)(myHandler.getHeight() * 0.37), paint);
         }
     }
 
