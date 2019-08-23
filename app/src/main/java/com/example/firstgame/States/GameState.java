@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 import com.example.firstgame.Button;
 import com.example.firstgame.Colors;
@@ -28,7 +29,7 @@ public class GameState extends State {
     private boolean pause = false;
     private int score,highScore;
     private Button pauseBtn, musicBtn,scoreBoard, playBtn, resumeBtn;
-    private boolean[] levels = new boolean[7];
+    private boolean[] levels = new boolean[11];
     private int timesLost=0;
 
     public GameState(MyHandler myHandler){
@@ -37,7 +38,9 @@ public class GameState extends State {
 
         obstacleHandler = new ObstacleHandler(myHandler);
         highScore = this.myHandler.getGamePanel().getHighScore();
-        addToFirebase(highScore);
+        addScoreToFirebase(highScore);
+
+        addTimesPlayedToFirebase(this.myHandler.getGamePanel().getTimesPlayed());
 
         gameOver = true;
         gameRunning = false;
@@ -62,7 +65,6 @@ public class GameState extends State {
         Bitmap bmpResume = BitmapFactory.decodeResource(myHandler.getGamePanel().getResources(),R.drawable.resume);
         resumeBtn = new Button((int)(myHandler.getWidth() * 0.5 - (bmpResume.getWidth()/2) ),(int)(myHandler.getHeight() * 0.5- (bmpResume.getHeight()/2) ),(int)(myHandler.getWidth() * 0.09),
                 (int)(myHandler.getHeight() * 0.07), myHandler, R.drawable.resume);
-
     }
 
     private void startGame(){
@@ -108,9 +110,11 @@ public class GameState extends State {
             return;
         }
 
-        if(isGameOver() && playBtn.isClicked() && !gameRunning){
-            startGame();
-        }
+        if(!gameRunning)
+            if(isGameOver() && playBtn.isClicked() && Input.isClicked){
+                startGame();
+                Log.e("ERROR","PLAY");
+            }
 
         if(Input.isClicked && resumeBtn.isClicked() && pause){
             try {
@@ -119,6 +123,7 @@ public class GameState extends State {
                 e.printStackTrace();
             }
             pause = false;
+            Log.e("ERROR","RESUME");
         }
 
         if(pause) return;
@@ -172,6 +177,22 @@ public class GameState extends State {
             obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(6));
             obstacleHandler.increaseSpeed(5,0);
             levels[6] = true;
+        }else if(score == 230 && !levels[7]) {
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(2));
+            obstacleHandler.increaseSpeed(2,0);
+            levels[7] = true;
+        }else if(score == 290 && !levels[8]) {
+            this.myHandler.getPlayer().setSpeed(this.myHandler.getPlayer().getSpeed() + 2);
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(3));
+            levels[8] = true;
+        }else if(score == 350 && !levels[9]) {
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(4));
+            obstacleHandler.increaseSpeed(2,0);
+            levels[9] = true;
+        }else if(score == 450 && !levels[10]) {
+            obstacleHandler.setCurrentColor(Colors.ALL_COLORS.get(5));
+            obstacleHandler.increaseSpeed(1,2);
+            levels[10] = true;
         }
     }
 
@@ -200,14 +221,6 @@ public class GameState extends State {
             showGameOver(canvas);
         }
 
-//        if(instructions){ //Show instructions
-//            showInstructions(canvas);
-//        }
-
-//        if(welcomeScreen){ //Show welcome screen
-//            showWelcomeScreen(canvas);
-//        }
-
         if(pause){
             //showGamePause(canvas);
             musicBtn.draw(canvas);
@@ -215,12 +228,15 @@ public class GameState extends State {
         }
     }
 
-
     public boolean isGameOver() {
         return gameOver;
     }
 
     public void setGameOver() {
+        //getTimesPlayed() {
+
+        addTimesPlayedToFirebase(myHandler.getGamePanel().getTimesPlayed() + 1);
+        Input.isClicked = false;
         timesLost++;
 
         this.gameOver = true;
@@ -236,7 +252,7 @@ public class GameState extends State {
         if(score > highScore) { //Save high-score
             this.myHandler.getGamePanel().saveScore(score);
             highScore = this.myHandler.getGamePanel().getHighScore();
-            addToFirebase(highScore);
+            addScoreToFirebase(highScore);
         }
 
         try{
@@ -257,31 +273,6 @@ public class GameState extends State {
 
     public void increaseScore(){
         this.score += eachPoint;
-    }
-
-    /**
-     * Show welcome screen
-     * It is shown only the first time the game opens
-     * @param canvas
-     */
-    private void showWelcomeScreen(Canvas canvas){
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextSize(95);
-        canvas.drawText("Click to play", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.30), paint);
-    }
-
-    /**
-     * Show the instructions on the screen
-     * When game is not running
-     * @param canvas
-     */
-    private void showInstructions(Canvas canvas){
-        Paint paint = new Paint();
-        paint.setColor(Color.WHITE);
-        paint.setTextSize(70);
-        canvas.drawText("Click right or left", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.70), paint);
-        canvas.drawText("to define the direction", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.75), paint);
     }
 
     /**
@@ -310,17 +301,6 @@ public class GameState extends State {
         paint.setTextAlign(Paint.Align.CENTER);
         canvas.drawText("High Score: " + highScore, (int) (myHandler.getWidth() /2), (int)(myHandler.getHeight() * 0.90), paint);
 
-    }
-
-    /**
-     * Show game pause screen
-     */
-    private void showGamePause(Canvas canvas){
-        Paint paint = new Paint();
-        paint.setColor(Color.BLACK);
-        paint.setTextAlign(Paint.Align.CENTER);
-        paint.setTextSize(65);
-        canvas.drawText("Pause", (int) (myHandler.getWidth() * 0.20), (int)(myHandler.getHeight() * 0.40), paint);
     }
 
     /**
@@ -358,12 +338,20 @@ public class GameState extends State {
      * Add high score to firebase if there is an interent connection;
      * @param score
      */
-    private void addToFirebase(int score){
+    private void addScoreToFirebase(int score){
         if(myHandler.getGamePanel().isConnected()){
-            this.myHandler.getGamePanel().getFirebase().addScore(this.myHandler.getGamePanel().getUsername(),score);
+            this.myHandler.getGamePanel().getFirebase().addScoreUpdated(this.myHandler.getGamePanel().getUsername(),score);
         }else{
             System.out.println("NO INTERNET");
         }
+    }
 
+    private void addTimesPlayedToFirebase(int times){
+        this.myHandler.getGamePanel().saveTimesPlayed(times);
+        if(myHandler.getGamePanel().isConnected()){
+            this.myHandler.getGamePanel().getFirebase().addTimesPlayed(this.myHandler.getGamePanel().getUsername(),times);
+        }else{
+            System.out.println("NO INTERNET");
+        }
     }
 }

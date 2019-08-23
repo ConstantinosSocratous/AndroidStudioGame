@@ -22,6 +22,7 @@ public class MainThread extends Thread{
         this.running = running;
     }
 
+
     @Override
     public void run(){
         long startTime;
@@ -78,6 +79,38 @@ public class MainThread extends Thread{
                 //System.out.println("FPS: " + averageFPS);
             }
         }
-
     }
+
+//
+//    @Override
+//    public void run() {
+//        long lastTime = System.nanoTime();
+//        double amountOfTicks = 60.0;
+//        double ns = 1000000000 / amountOfTicks;
+//        double delta = 0;
+//        long timer = System.currentTimeMillis();
+//        int frames = 0 ;
+//        while (running) {
+//            long now = System.nanoTime();
+//            delta += (now - lastTime) / ns;
+//            lastTime = now;
+//            while (delta >= 1) {
+//                this.gamePanel.update();
+//                delta--;
+//            }
+//            if(running)
+//                try{
+//                    this.gamePanel.draw(canvas);
+//                }catch (Exception e){
+//                }
+//            frames++;
+//
+//            if(System.currentTimeMillis() - timer > 1000) {
+//                timer += 1000;
+//                System.out.println("FPS: " + frames);
+//                frames = 0;
+//            }
+//        }
+//       // stop();
+//    }
 }

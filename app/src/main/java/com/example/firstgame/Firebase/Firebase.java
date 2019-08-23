@@ -14,16 +14,22 @@ import java.util.concurrent.Semaphore;
 
 public class Firebase{
 
-    private DatabaseReference database;
+    private DatabaseReference updatedDatabase;
     private ArrayList<String> nicknames = new ArrayList<>();
     private ArrayList<User> users;
 
     public Firebase(){
-        database = FirebaseDatabase.getInstance().getReference("/players");
     }
 
-    public void addScore(String user, int score) {
-        database.child(user).setValue(score);
+    public void addScoreUpdated(String user, int score) {
+        updatedDatabase = FirebaseDatabase.getInstance().getReference("/playersUpdated/" + user);
+        updatedDatabase.child("score").setValue(score);
+        start();
+    }
+
+    public void addTimesPlayed(String user, int times) {
+        updatedDatabase = FirebaseDatabase.getInstance().getReference("/playersUpdated/" + user);
+        updatedDatabase.child("timesPlayed").setValue(times);
         start();
     }
 
@@ -36,15 +42,23 @@ public class Firebase{
     }
 
     public void start(){
+       readData();
+    }
 
-        database.addValueEventListener(new ValueEventListener() {
+    public void readData(){
+        updatedDatabase = FirebaseDatabase.getInstance().getReference("/playersUpdated");
+
+        updatedDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 users = new ArrayList<>();
                 nicknames = new ArrayList<>();
                 for (DataSnapshot postSnapshot: snapshot.getChildren()) {
                     nicknames.add(postSnapshot.getKey());
-                    users.add(new User(postSnapshot.getKey(), Integer.parseInt(postSnapshot.getValue().toString())));
+                    long score = (long) postSnapshot.child("score").getValue();
+                    long timesPlayed= (long) postSnapshot.child("timesPlayed").getValue();
+
+                    users.add(new User(postSnapshot.getKey(), (int)score, (int) timesPlayed));
                 }
             }
 

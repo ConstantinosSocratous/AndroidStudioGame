@@ -448,6 +448,59 @@ public class GamePanel extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+    /**
+     * Get high score from file
+     * @return
+     */
+    public int getTimesPlayed() {
+        String a="0";
+        try {
+            FileInputStream file = getContext().openFileInput("timesPlayed.txt");
+            InputStreamReader isr = new InputStreamReader(file);
+            BufferedReader br = new BufferedReader(isr);
+            StringBuilder sb = new StringBuilder();
+            String text;
+
+            if ((text = br.readLine()) != null) {
+                a = text;
+            }
+
+            file.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return Integer.parseInt(a);
+    }
+
+    /**
+     * Save highScore
+     * @param str
+     */
+    public void saveTimesPlayed(int str) {
+        String text = ""+str;
+        FileOutputStream fos = null;
+
+        try {
+            fos = getContext().openFileOutput("timesPlayed.txt", getContext().MODE_PRIVATE);
+            fos.write(text.getBytes());
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (fos != null) {
+                try {
+                    fos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     public String getUsername(){
         return this.username;
     }
